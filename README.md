@@ -11,7 +11,7 @@
 &emsp;系统整体设计逻辑：<br>
 &emsp;&emsp;基础设施建设阶段提供部分可复用性较强功能模块，中期提供完成业务流程功能，后期同其他系统进行功能交互融合。<br>
 <br>
-核心理念：“一套标准的用例/指标规范 + 可插拔执行器 + 可追溯的结果仓 + 低代码编排”。<br>
+## 核心理念：“一套标准的用例/指标规范 + 可插拔执行器 + 可追溯的结果仓 + 低代码编排”。<br>
 <br>
 ## 基础设施模块：<br>
 &emsp;1、环境配置模块<br>
@@ -24,24 +24,15 @@
 
 ## 1、环境配置模块：<br>
 &emsp;预期：封装自动化linux环境配置，针对大模型执行所需的相关配套组件，提供指定版本的自动化环境部署。相关配套组件如：vllm, vllm_mindspore, mindspore_gs, msadapter, python, aisbench等。<br>
-
-&emsp;实施：<br>
-&emsp;&emsp;（1）环境定义标准化：支持三类规格文件：<br>
 <br>
-&emsp;&emsp;&emsp;env.yaml：基础镜像、驱动、CUDA/ROCm、Python 版本、关键依赖版本（vLLM、msadapter、MindSpore、aisbench…）<br>
-<br>
-&emsp;&emsp;&emsp;hardware.yaml：GPU/CPU/内存/网络/电源限制（功耗上限）、NUMA 绑核策略<br>
-<br>
-&emsp;&emsp;&emsp;runtime.yaml：容器启动参数、挂载、端口、超时、日志重定向规则<br>
-<br>
-&emsp;&emsp;（2）镜像优先策略：优先指定镜像（不可变环境），其次才是按需 pip/apt 安装（可变环境，降低优先级）。<br>
-<br>
-&emsp;&emsp;（3）镜像仓库集成：支持多 registry（私有/公有），拉取凭据保存在 Secrets 管理器（Vault/K8s Secret）。<br>
-<br>
-&emsp;&emsp;（4）幂等+回滚：每次环境变更产生日志和快照（镜像 tag + env 指纹哈希），支持一键回滚。<br>
-<br>
-<br>
-&emsp;&emsp;（5）执行效果：点击指定服务器图标后，顶端可提供已有镜像清单，此处数据可从指定镜像仓库获取。如已指定镜像切不再需要单独配置，则下方各配置项自动填充为该镜像内依赖版本信息，如需修改则可按需修改，如无待修改项，则直接使用即可。此模块需在画布工作流模块执行可视化调用。<br>
+&emsp;（1）环境定义标准化：支持三类规格文件：<br>
+&emsp;&emsp;env.yaml：基础镜像、驱动、CUDA/ROCm、Python 版本、关键依赖版本（vLLM、msadapter、MindSpore、aisbench…）<br>
+&emsp;&emsp;hardware.yaml：GPU/CPU/内存/网络/电源限制（功耗上限）、NUMA 绑核策略<br>
+&emsp;&emsp;runtime.yaml：容器启动参数、挂载、端口、超时、日志重定向规则<br>
+&emsp;（2）镜像优先策略：优先指定镜像（不可变环境），其次才是按需 pip/apt 安装（可变环境，降低优先级）。<br>
+&emsp;（3）镜像仓库集成：支持多 registry（私有/公有），拉取凭据保存在 Secrets 管理器（Vault/K8s Secret）。<br>
+&emsp;（4）幂等+回滚：每次环境变更产生日志和快照（镜像 tag + env 指纹哈希），支持一键回滚。<br>
+&emsp;（5）执行效果：点击指定服务器图标后，顶端可提供已有镜像清单，此处数据可从指定镜像仓库获取。如已指定镜像切不再需要单独配置，则下方各配置项自动填充为该镜像内依赖版本信息，如需修改则可按需修改，如无待修改项，则直接使用即可。此模块需在画布工作流模块执行可视化调用。<br>
 <br>
 ## 2、日志文件管理模块<br>
 &emsp;预期：提供日志解析功能，可在该模块内提供，<br>
@@ -55,8 +46,8 @@
 <br>
 ## 3、工具管理模块<br>
 &emsp;预期：提供测试工具管理可视化操作页面，可引入，管理各类测试工具，可指定工具位置，工具入参，工具执行后相关日志所在位置，可调用日志文件管理模块针对包含执行数据等日志文件进行关键数据获取过滤。<br>
-&emsp;（1）工具描述清单 tool.yaml：<br>
 <br>
+&emsp;（1）工具描述清单 tool.yaml：<br>
 &emsp;&emsp;元信息：名称、版本、来源（git tag/commit、镜像）、许可证<br>
 &emsp;&emsp;入参Schema（JSON Schema）：确保画布/表单参数合法性<br>
 &emsp;&emsp;输出Schema：日志路径、结果文件路径、预期采集的指标字段<br>
@@ -68,21 +59,22 @@
 ## 4、模型管理模块<br>
 &emsp;预期：提供针对各类模型的调用执行设置，可在该模块内添加模型执行命令，各类候选参数，是否需重定向日志，如需重定向，可指定日志相对路径。<br>
 <br>
-&emsp;&emsp;（1）模型清单 model.yaml：<br>
-&emsp;&emsp;&emsp;模型ID、权重来源（S3/HuggingFace/私有仓）、版本哈希、Tokenizer 版本<br>
-&emsp;&emsp;&emsp;推理后端（vLLM/vllm_mindspore/自研后端），启动命令模板（支持占位符）<br>
-&emsp;&emsp;&emsp;运行形态（单卡/多卡、张量并行、pipeline 并行、MoE 配置）<br>
-&emsp;&emsp;&emsp;日志与指标导出（OpenTelemetry/Prometheus exporter 开关）<br>
-&emsp;&emsp;（2）一致的推理服务契约（OpenAPI/gRPC IDL）：统一“/generate”、“/embed”、“/rerank”等接口，压测与精度校验工具可无缝替换后端。<br>
-&emsp;&emsp;（3）模型卡片（Model Card：自动展示维度：训练域、已知限制、适配任务、合规标签（安全、隐私）。<br>
+&emsp;（1）模型清单 model.yaml：<br>
+&emsp;&emsp;模型ID、权重来源（S3/HuggingFace/私有仓）、版本哈希、Tokenizer 版本<br>
+&emsp;&emsp;推理后端（vLLM/vllm_mindspore/自研后端），启动命令模板（支持占位符）<br>
+&emsp;&emsp;运行形态（单卡/多卡、张量并行、pipeline 并行、MoE 配置）<br>
+&emsp;&emsp;日志与指标导出（OpenTelemetry/Prometheus exporter 开关）<br>
+&emsp;（2）一致的推理服务契约（OpenAPI/gRPC IDL）：统一“/generate”、“/embed”、“/rerank”等接口，压测与精度校验工具可无缝替换后端。<br>
+&emsp;（3）模型卡片（Model Card：自动展示维度：训练域、已知限制、适配任务、合规标签（安全、隐私）。<br>
 <br>
 ## 5、数据展示模块<br>
 &emsp;预期：当前系统首页展示即为数据展示模块，该模块内提供常规数据汇总展示，竞品数据对比展示，压测数据展示。<br>
+<br>
 &emsp;（1）首页仪表盘（可配置卡片）：<br>
 &emsp;&emsp;当天/本周关键指标（TTFT/TBT/TTE、吞吐、Token成本、GPU利用率、能耗）<br>
 &emsp;&emsp;失败率&失败 Top 原因、告警<br>
 &emsp;&emsp;最近竞品对比/压测趋势<br>
-&emsp;（2）三类常规展示
+&emsp;（2）三类常规展示<br>
 &emsp;&emsp;&emsp;常规数据展示一：按场景/用例汇总（版本切换）：支持钻取到单次 Run，查看日志与调用链。用于在选择指定版本场景后罗列展示所有看护数据，基于某一依赖版本信息作为筛选条件，以场景或用例维度进行数据汇总展示。<br>
 &emsp;&emsp;&emsp;常规数据展示二：跨版本趋势：同一指标随依赖演进的趋势；支持自动回归检测（阈值或统计检验）。以用例或场景为筛选条件，在不同版本配套维度进行某一指标的跨版本数据展示，可展示该指标在不同版本演进过程中的数据分布和变化趋势。<br>
 &emsp;&emsp;&emsp;常规数据展示三：工具数据汇总：统一“工具-版本-环境-指标”四维透视，支持筛选/导出。针对各类测试工具执行后输出的各类测试数据，进行汇总展示。<br>
@@ -98,6 +90,7 @@
 <br>
 ## 6、画布工作流模块<br>
 &emsp;预期：形成可引入完整流程的的低代码平台，可拖拽环境配置模块，模型管理模块，工具管理模块内表示图标至画布内，通过箭头标识线连接，指定工作流执行顺序。<br>
+<br>
 &emsp;节点类型：环境准备节点、模型服务节点、工具执行节点、对比计算节点、报告生成节点、清理回收节点。<br>
 &emsp;边的语义：数据依赖（产出/消费）、控制依赖（成功/失败/重试）、并行/汇聚。<br>
 &emsp;表单自动生成：基于工具/模型的 JSON Schema 自动生成可视化表单。<br>
