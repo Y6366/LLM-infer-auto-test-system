@@ -104,3 +104,5 @@
 &emsp;表单自动生成：基于工具/模型的 JSON Schema 自动生成可视化表单。<br>
 &emsp;策略：超时、重试、断点续跑、幂等、批量矩阵（不同参数/不同硬件组合的自动展开）。<br>
 &emsp;Dry-run & Lint：提交前进行语义校验（必填参数、依赖闭环、资源配额）。<br>
+<img width="2302" height="1380" alt="7251c5b8d8b5793c06611d8e33072b6d" src="https://github.com/user-attachments/assets/6fa6c1dc-5a26-4c94-9add-c04b4dad34a0" />
+
