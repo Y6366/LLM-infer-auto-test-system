@@ -1,7 +1,7 @@
 # LLM-infer-auto-test-system
 用于针对大模型产品进行自动化测试平台<br>
 <br>
-## WHY？<br>
+## WHAT？<br>
 当前平台预期解决哪些问题？<br>
 &emsp;1、针对各类大模型产品可进行性能，精度相关指标测试，及相关数据展示。<br>
 &emsp;2、针对同一模型部署在不同服务器类型进行硬件层面竞品测试，及相关数据展示。<br>
@@ -34,6 +34,10 @@
 &emsp;（4）幂等+回滚：每次环境变更产生日志和快照（镜像 tag + env 指纹哈希），支持一键回滚。<br>
 &emsp;（5）执行效果：点击指定服务器图标后，顶端可提供已有镜像清单，此处数据可从指定镜像仓库获取。如已指定镜像切不再需要单独配置，则下方各配置项自动填充为该镜像内依赖版本信息，如需修改则可按需修改，如无待修改项，则直接使用即可。此模块需在画布工作流模块执行可视化调用。<br>
 <br>
+<img width="2300" height="1386" alt="89139dd8e13a2b59c1866800d1e277e9" src="https://github.com/user-attachments/assets/14b9514f-9641-47f6-93cf-7650355fc7ac" />
+<img width="2304" height="1380" alt="3f2d04e340f6bf1e1860543a60339bcb" src="https://github.com/user-attachments/assets/11801e32-b6b5-4f59-bfa0-5a1d100e945d" />
+
+
 ## 2、日志文件管理模块<br>
 &emsp;预期：提供日志解析功能，可在该模块内提供，<br>
 &emsp;&emsp;测试工具日志文件样例，可标注关键数据含义，关键信息含义，用于数据展示模块调用展示。<br>
@@ -68,6 +72,9 @@
 &emsp;（2）一致的推理服务契约（OpenAPI/gRPC IDL）：统一“/generate”、“/embed”、“/rerank”等接口，压测与精度校验工具可无缝替换后端。<br>
 &emsp;（3）模型卡片（Model Card：自动展示维度：训练域、已知限制、适配任务、合规标签（安全、隐私）。<br>
 <br>
+<img width="2300" height="1382" alt="d1ffcd18af20722467f7ec9c675640c1" src="https://github.com/user-attachments/assets/359fba67-bddd-45d6-9559-758fbfc4b4ac" />
+<img width="2302" height="1382" alt="edfe9f2de11a6565c701405f52ea460b" src="https://github.com/user-attachments/assets/62e8eee3-76f1-4437-a64b-e880d3d26b08" />
+
 ## 5、数据展示模块<br>
 &emsp;预期：当前系统首页展示即为数据展示模块，该模块内提供常规数据汇总展示，竞品数据对比展示，压测数据展示。<br>
 <br>
