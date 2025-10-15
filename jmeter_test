@@ -1,0 +1,301 @@
+一、自动化的核心原则
+	•	非 GUI 执行：一切以命令行模式运行，避免 GUI 带来的资源开销与不稳定性。 ￼
+	•	版本收敛：使用 jmeter-maven-plugin 在构建期拉起 JMeter，统一依赖来源与默认 JMeter 版本。 ￼
+	•	阈值门禁：通过断言/阈值控制让构建“自动失败”（如错误率>1%、P95>某阈值）。 ￼
+	•	可视化与留痕：同时产出 JMeter HTML 仪表盘并归档，必要时接入 InfluxDB+Grafana 做时序看板。 
+
+
+二、项目内集成
+目录约定
+src/test/jmeter/            # .jmx 脚本、CSV 数据、用户属性
+src/test/jmeter/user.properties
+
+POM 片段（最小可用 + 阈值门禁 + 报告生成）
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.lazerycode.jmeter</groupId>
+      <artifactId>jmeter-maven-plugin</artifactId>
+      <version>3.8.0</version>
+      <executions>
+        <!-- 生成运行所需配置 -->
+        <execution>
+          <id>configuration</id>
+          <goals><goal>configure</goal></goals>
+        </execution>
+        <!-- 执行 JMeter 用例（非 GUI）-->
+        <execution>
+          <id>jmeter-tests</id>
+          <goals><goal>jmeter</goal></goals>
+        </execution>
+        <!-- 扫描结果并按阈值/失败用例让构建失败 -->
+        <execution>
+          <id>jmeter-check-results</id>
+          <goals><goal>results</goal></goals>
+          <configuration>
+            <!-- 错误率阈值：>1% 则失败 -->
+            <errorRateThresholdInPercent>1</errorRateThresholdInPercent>
+            <ignoreResultFailures>false</ignoreResultFailures>
+          </configuration>
+        </execution>
+      </executions>
+      <configuration>
+        <!-- 结果/报告与属性注入 -->
+        <resultsFileFormat>csv</resultsFileFormat>
+        <propertiesUser>src/test/jmeter/user.properties</propertiesUser>
+        <generateReports>true</generateReports>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+
+运行参数化（覆盖 .jmx 里变量）
+mvn -Pperf clean verify \
+  -Djmeter.property.baseUrl=http://localhost:8080 \
+  -Djmeter.property.threads=200 \
+  -Djmeter.property.rampUp=60 \
+  -Djmeter.property.duration=300
+
+三、断言与“自动失败”策略（把 GUI 的校验搬到自动化）
+	1.	功能正确性：在 .jmx 里加 Response Assertion（状态码/文本包含）→ 任一失败即计入 error。
+	2.	时长阈值：加 Duration Assertion（如单次>2s 直接失败），配合上面的 results 目标即可让构建红灯。 ￼
+	3.	错误率红线：由 errorRateThresholdInPercent 控制整体门禁（例如 1%）。 ￼
+	4.	Pxx 指标：可在测试计划结束时加 JSR223/BeanShell 汇总校验，或在 CI 阶段解析结果再做二次门禁（见下文流水线）。
+
+四、CI/CD：GitHub Actions 与 Jenkins 样例
+
+GitHub Actions（服务先起，再跑压测）
+name: perf
+on:
+  workflow_dispatch:
+  push: { branches: [ main ] }
+
+jobs:
+  jmeter:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: pass
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17', cache: maven }
+      # 启动被测 Spring Boot（也可用 docker-compose）
+      - name: Start SUT
+        run: |
+          mvn -DskipTests -q -pl :app-module package
+          nohup java -jar app-module/target/app.jar --spring.profiles.active=perf &
+          for i in {1..60}; do curl -fsS http://localhost:8080/actuator/health && break || sleep 2; done
+      # 执行 JMeter（覆盖变量）
+      - name: Run JMeter
+        run: >
+          mvn -Pperf -q verify
+          -Djmeter.property.baseUrl=http://localhost:8080
+          -Djmeter.property.threads=150
+          -Djmeter.property.rampUp=60
+          -Djmeter.property.duration=300
+      # 归档 JMeter HTML 报告与原始 JTL/CSV
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jmeter-report
+          path: |
+            target/jmeter/**/*
+
+七、（可选）代码即压测：jmeter-java-dsl
+
+如果你更想“写测试像写单测”，用 jmeter-java-dsl 把脚本转 Java 代码，并在 JUnit 中做指标断言（适合和功能回归一并跑）：
+
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+
+class PerfSmokeTest {
+  @Test
+  void smoke() throws Exception {
+    var stats = testPlan(
+        threadGroup()
+          .rampToAndHold(150, Duration.ofSeconds(60), Duration.ofMinutes(5))
+          .children(
+            httpDefaults().url(System.getProperty("baseUrl", "http://localhost:8080")),
+            httpSampler("/api/v1/health"),
+            durationAssertion().durationLessThan(2_000)
+          ),
+        summaryStats()
+    ).run();
+
+    assertThat(stats.overall().errorsCount()).isEqualTo(0);
+  }
+}
+
+方式 A（推荐）：JTL→Java 汇总，生成“聚合报告表 + 明细表”
+
+1）确保 JMeter 以 CSV 方式保存你需要的列
+
+在 user.properties（或 jmeter.properties）里开启常用列：
+
+
+jmeter.save.saveservice.output_format=csv
+jmeter.save.saveservice.print_field_names=true
+# 常用字段
+jmeter.save.saveservice.time=true
+jmeter.save.saveservice.timestamp_format=ms
+jmeter.save.saveservice.label=true
+jmeter.save.saveservice.response_code=true
+jmeter.save.saveservice.response_message=true
+jmeter.save.saveservice.success=true
+jmeter.save.saveservice.bytes=true
+jmeter.save.saveservice.sent_bytes=true
+jmeter.save.saveservice.latency=true
+jmeter.save.saveservice.connect_time=true
+jmeter.save.saveservice.thread_name=true
+
+用 CLI 跑（或用 jmeter-maven-plugin），得到 results.jtl（CSV）。
+
+2）用 Java 聚合出“聚合报告”（含 Samples、Avg、P90/95/99、Error%、Throughput、KB/s）
+
+新建一个工具类（可放测试代码里 src/test/java，或独立模块）。它会读取 results.jtl，按照 label 分组做统计，并打印成 Markdown 表格或控制台 ASCII 表。
+
+import java.io.*;
+import java.nio.file.*;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class JtlAggregator {
+
+  static class Row {
+    long ts;        // timeStamp (ms)
+    long elapsed;   // 请求耗时(ms)
+    String label;   // 事务/请求名
+    boolean success;
+    int code;       // HTTP code 之类
+    long bytes;     // 收到字节
+    long sentBytes; // 发送字节
+  }
+
+  static class Stat {
+    List<Long> durations = new ArrayList<>();
+    long firstStart = Long.MAX_VALUE;
+    long lastEnd = Long.MIN_VALUE;
+    long ok = 0, total = 0;
+    long bytes = 0, sent = 0;
+  }
+
+  public static void main(String[] args) throws Exception {
+    Path jtl = Paths.get(args.length > 0 ? args[0] : "target/jmeter/results.jtl");
+    List<Row> rows = readJtl(jtl);
+
+    // 按 label 聚合
+    Map<String, Stat> map = new LinkedHashMap<>();
+    for (Row r : rows) {
+      Stat s = map.computeIfAbsent(r.label, k -> new Stat());
+      s.durations.add(r.elapsed);
+      s.firstStart = Math.min(s.firstStart, r.ts);
+      s.lastEnd = Math.max(s.lastEnd, r.ts + r.elapsed);
+      s.total++;
+      if (r.success) s.ok++;
+      s.bytes += r.bytes;
+      s.sent += r.sentBytes;
+    }
+
+    // 打印“聚合报告”
+    System.out.println("\n# Aggregate Report\n");
+    System.out.println("| Label | Samples | Avg(ms) | Min | P90 | P95 | P99 | Max | Error% | Throughput (req/s) | Recv KB/s | Sent KB/s |");
+    System.out.println("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|");
+    DecimalFormat df2 = new DecimalFormat("0.00");
+
+    for (var e : map.entrySet()) {
+      String label = e.getKey();
+      Stat s = e.getValue();
+      Collections.sort(s.durations);
+      int n = s.durations.size();
+      long min = s.durations.get(0);
+      long max = s.durations.get(n - 1);
+      double avg = s.durations.stream().mapToLong(x -> x).average().orElse(0);
+      long p90 = percentile(s.durations, 0.90);
+      long p95 = percentile(s.durations, 0.95);
+      long p99 = percentile(s.durations, 0.99);
+      double err = (1.0 - (double) s.ok / s.total) * 100.0;
+      double durationSec = Math.max(1.0, (s.lastEnd - s.firstStart) / 1000.0);
+      double tps = s.total / durationSec;
+      double rkbps = (s.bytes / 1024.0) / durationSec;
+      double skbps = (s.sent / 1024.0) / durationSec;
+
+      System.out.printf("| %s | %d | %s | %d | %d | %d | %d | %d | %s | %s | %s | %s |\n",
+          label, s.total, df2.format(avg), min, p90, p95, p99, max,
+          df2.format(err), df2.format(tps), df2.format(rkbps), df2.format(skbps));
+    }
+
+    // 打印“用表格查看结果”（等同 GUI 明细表）：前 20 行示例
+    System.out.println("\n# View Results in Table (前20条)\n");
+    System.out.println("| timeStamp | elapsed | label | code | success | bytes | sentBytes | thread |");
+    System.out.println("|---:|---:|---|---:|:---:|---:|---:|---|");
+    rows.stream().limit(20).forEach(r ->
+        System.out.printf("| %d | %d | %s | %d | %s | %d | %d | %s |\n",
+            r.ts, r.elapsed, r.label, r.code, r.success, r.bytes, r.sentBytes, "n/a")
+    );
+  }
+
+  private static long percentile(List<Long> sorted, double p) {
+    if (sorted.isEmpty()) return 0;
+    double idx = p * (sorted.size() - 1);
+    int i = (int) Math.floor(idx);
+    int j = Math.min(sorted.size() - 1, i + 1);
+    double frac = idx - i;
+    return (long) Math.round(sorted.get(i) * (1 - frac) + sorted.get(j) * frac);
+  }
+
+  private static List<Row> readJtl(Path csv) throws Exception {
+    try (BufferedReader br = Files.newBufferedReader(csv)) {
+      String header = br.readLine();
+      if (header == null) return List.of();
+      String[] cols = header.split(",");
+      Map<String, Integer> idx = new HashMap<>();
+      for (int i = 0; i < cols.length; i++) idx.put(cols[i].trim(), i);
+
+      List<Row> list = new ArrayList<>();
+      for (String line; (line = br.readLine()) != null; ) {
+        // 简单 CSV 拆分（字段中不应包含逗号；若有请换用 CSV 解析库）
+        String[] x = line.split(",", -1);
+        Row r = new Row();
+        r.ts = parseLong(x, idx.getOrDefault("timeStamp", -1));
+        r.elapsed = parseLong(x, idx.getOrDefault("elapsed", -1));
+        r.label = get(x, idx.getOrDefault("label", -1));
+        r.success = "true".equalsIgnoreCase(get(x, idx.getOrDefault("success", -1)));
+        r.code = (int) parseLong(x, idx.getOrDefault("responseCode", -1));
+        r.bytes = parseLong(x, idx.getOrDefault("bytes", -1));
+        r.sentBytes = parseLong(x, idx.getOrDefault("sentBytes", -1));
+        list.add(r);
+      }
+      return list;
+    }
+  }
+
+  private static long parseLong(String[] x, int i) {
+    try { return i >= 0 ? Long.parseLong(x[i]) : 0L; } catch (Exception e) { return 0L; }
+  }
+  private static String get(String[] x, int i) { return i >= 0 ? x[i] : ""; }
+}
+怎么用：
+# 1）先跑压测得到 JTL（CSV）
+jmeter -n -t src/test/jmeter/demo.jmx -l target/jmeter/results.jtl -q src/test/jmeter/user.properties
+
+# 2）运行聚合器（把路径换成你的）
+javac JtlAggregator.java && java JtlAggregator target/jmeter/results.jtl
+
+得到两张表：
+	•	Aggregate Report：相当于 GUI 的“聚合报告”，含 Samples、平均/分位数、Error%、TPS、KB/s。
+	•	View Results in Table（前 20 行）：等同 GUI 的“用表格查看结果”的明细。
+
+你可以把打印改成写入 Markdown/HTML 文件，或放到 Spring Boot 的端点返回（比如 /perf/report 返回 JSON/表格）。
+
+
+
