@@ -227,6 +227,34 @@ backendListener(INFLUX_DB_V2) + Grafana
 
 
 
+DSL 与 GUI 对照表
+
+GUI 元件
+Java DSL 对应方法
+Test Plan
+testPlan()
+Thread Group
+threadGroup(), rampToAndHold()
+HTTP Request
+httpSampler()
+CSV Data Set Config
+csvDataSet()
+Uniform Random Timer
+uniformRandomTimer()
+Constant Throughput Timer
+constantThroughputTimer()
+Response Assertion
+responseAssertion()
+If Controller
+ifController()
+JSR223 Pre/Post Processor
+jsr223PreProcessor(), jsr223PostProcessor()
+Regex Extractor
+regexExtractor()
+Summary Report
+summaryStats()
+Backend Listener
+backendListener()
 
 
 
