@@ -1,0 +1,232 @@
+🧩 一、JMeter Java DSL 简介
+
+jmeter-java-dsl 是由 Abstracta 开源的一个 DSL（领域特定语言）库，让你用 Java 代码直接描述 JMeter 脚本，而不是维护复杂的 .jmx 文件。
+
+它的核心理念是：
+
+“让性能测试像单元测试一样编写和运行。”
+
+主要特性：
+	•	无需 JMeter GUI；
+	•	自动管理线程组、采样器、定时器、断言；
+	•	支持所有常见 JMeter 功能；
+	•	可在 IDE 或 CI 中运行；
+	•	可直接生成 .jmx 文件和 HTML 报告。
+
+⸻
+
+⚙️ 二、基础结构
+
+在 DSL 中，一个完整的测试脚本通常包含三层结构：
+testPlan(
+  threadGroup()
+    .children(
+       httpSampler("path").method("GET"),
+       responseAssertion().containsSubstrings("OK")
+    ),
+  summaryStats() // 控制台汇总输出
+).run();
+
+层级
+说明
+testPlan()
+顶层容器，等价于 JMeter 的 Test Plan
+threadGroup()
+线程组（并发用户、RampUp、循环次数）
+.children()
+线程组内的请求、配置、定时器、断言等
+httpSampler()
+请求定义（URL、方法、Header、Body）
+assertion()
+响应断言（内容、时长、状态码）
+summaryStats()
+结果汇总监听器（等价 GUI 的“汇总报告”）
+
+
+三、核心组件与方法详解
+
+1️⃣ Test Plan（测试计划）
+testPlan(children...)         // 定义整个计划
+testPlan(threads, rampUp, duration) // 可同时设置线程参数
+
+还可嵌套多个 threadGroup 或 backendListener。
+
+
+。
+
+⸻
+
+2️⃣ Thread Group（线程组）
+
+threadGroup()
+  .rampToAndHold(200, Duration.ofSeconds(60), Duration.ofMinutes(5)) // 60s内升到200线程并持续5分钟
+  .children(...);
+
+其他可用方法：
+threadGroup("name", 100, Duration.ofSeconds(30), children...) // 指定线程数与升温时间
+rampToAndHold()            // GUI “阶梯式加压”
+holdFor(Duration.ofMinutes(3))
+rampDownTo(0, Duration.ofSeconds(30))
+
+线程组方法完全等价于 GUI 中的「线程组」、「并发线程组」。
+
+HTTP Sampler（请求）
+
+httpSampler("/api/login")
+  .method("POST")
+  .body("{\"user\":\"admin\",\"pass\":\"123\"}")
+  .header("Content-Type", "application/json")
+  .header("Authorization", "Bearer token")
+  .timeout(Duration.ofSeconds(10));
+或指定完整 URL：
+
+httpDefaults().url("https://example.com")
+httpSampler("/api/health")
+
+通过 httpDefaults() 设置全局 BaseURL、Header、Cookie。
+
+Config 元件
+	•	HTTP Defaults
+
+httpDefaults().url("https://api.test.com")
+
+HTTP Headers
+
+httpHeaders().header("User-Agent", "JMeter-DSL")
+
+CSV Data Set
+
+csvDataSet("data.csv").variableNames("user,password")
+
+Cookies / Cache
+
+httpCookies()
+httpCache()
+
+
+⸻
+
+5️⃣ Timer（定时器）
+
+constantTimer(200)              // 固定延迟 200ms
+uniformRandomTimer(200, 500)    // 随机延迟 [200,700]ms
+constantThroughputTimer(100)    // 保持恒定吞吐量 100 RPS
+
+6️⃣ Controllers（逻辑控制器）
+ifController("vars.get('token') != null")
+  .children(httpSampler("/secured"))
+
+loopController(5)
+  .children(httpSampler("/ping"))
+
+等价于 GUI 中的 If Controller、Loop Controller 等。
+
+
+7️⃣ Pre/Post Processors（前后置处理器）
+
+jsr223PreProcessor("vars.put('ts', System.currentTimeMillis()+'')")
+jsr223PostProcessor("log.info('Response:' + prev.getResponseDataAsString())")
+
+regexExtractor("token", "\"token\":\"(.+?)\"") // 提取 JSON 中的 token
+jsonExtractor("id", "$.data.id")
+
+
+⸻
+
+8️⃣ Assertions（断言）
+
+responseAssertion()
+  .containsSubstrings("success") // 内容断言
+  .testField(ResponseField.RESPONSE_CODE)
+  .equalsTo("200")
+
+durationAssertion().durationLessThan(2000) // 响应时间 < 2s
+
+9️⃣ Listeners（监听器）
+
+summaryStats()                             // 控制台聚合报告
+backendListener(BackendListenerType.INFLUX_DB_V2)
+  .url("http://influxdb:8086")
+  .organization("demo")
+  .bucket("jmeter")
+  .token("my-token");
+
+或输出完整 HTML 报告：
+
+var stats = testPlan(...).run();
+stats.saveHtmlReport("target/jmeter-report");
+
+🔟 执行与结果对象
+
+var stats = testPlan(...).run();
+System.out.println("Total samples: " + stats.overall().samplesCount());
+System.out.println("Errors: " + stats.overall().errorsCount());
+System.out.println("Throughput: " + stats.overall().throughput());
+
+结果对象 stats 允许：
+	•	stats.overall() → 全局统计
+	•	stats.byLabel("接口名") → 单接口统计
+	•	导出报告：stats.saveAsJtl("results.jtl")
+
+
+五、完整示例（等价于 GUI 复合脚本）
+
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import java.time.Duration;
+
+public class DslPerfTest {
+  public static void main(String[] args) throws Exception {
+    var stats = testPlan(
+        httpDefaults().url("https://api.example.com"),
+        threadGroup("User Flow", 100, Duration.ofSeconds(30))
+            .rampToAndHold(100, Duration.ofSeconds(30), Duration.ofMinutes(3))
+            .children(
+                csvDataSet("users.csv").variableNames("user,password"),
+                httpSampler("/login")
+                    .method("POST")
+                    .body("{\"user\":\"${user}\",\"password\":\"${password}\"}")
+                    .header("Content-Type", "application/json"),
+                jsonExtractor("token", "$.token"),
+                ifController("vars.get('token') != null")
+                    .children(
+                        httpSampler("/data")
+                            .header("Authorization", "Bearer ${token}")
+                    ),
+                uniformRandomTimer(200, 500),
+                responseAssertion().containsSubstrings("OK")
+            ),
+        summaryStats()
+    ).run();
+
+    stats.saveAsJtl("target/jmeter/results.jtl");
+    stats.saveHtmlReport("target/jmeter/report");
+  }
+}
+
+✅ 这段代码等价于 JMeter GUI 脚本：
+	•	用户登录 + 提取 token；
+	•	携带 token 调用业务接口；
+	•	随机等待；
+	•	验证响应中包含 “OK”；
+	•	输出聚合报告与 HTML。
+
+六、实战用法建议
+
+目标
+方法
+快速编写小场景
+在单元测试类中用 @Test + DSL
+CI 自动化压测
+mvn test -Pperf
+压测结果入库
+用 stats.overall() 提取指标写入 Prometheus/DB
+兼容 GUI
+.saveAsJmx("plan.jmx") 导出为 JMeter 可视化文件
+实时监控
+backendListener(INFLUX_DB_V2) + Grafana
+
+
+
+
+
+
