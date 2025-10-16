@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: springboot-jmeter-dsl
+
+logging:
+  level:
+    root: INFO
