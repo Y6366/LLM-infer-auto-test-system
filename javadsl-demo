@@ -1,0 +1,80 @@
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.time.Duration;
+
+public class ParametrizedDslLoadTest {
+
+  public static void main(String[] args) throws Exception {
+    // ---- 读取入参（支持 -D 注入，括号内为默认值）----
+    String protocol = prop("protocol", "http");
+    String host     = prop("host", "127.0.0.1");          // IP / 主机名
+    int    port     = Integer.parseInt(prop("port", "8080"));
+    String path     = prop("path", "/api/echo");          // 接口 path
+    String method   = prop("method", "POST");             // GET/POST/PUT/DELETE...
+    String body     = prop("body", "{\"msg\":\"hello\"}");// 请求体（仅对有 body 的方法生效）
+    String contentType = prop("contentType", "application/json");
+
+    int threads     = Integer.parseInt(prop("threads", "50"));
+    int loops       = Integer.parseInt(prop("loops", "10")); // 每线程循环次数
+    int rampUpSec   = Integer.parseInt(prop("rampUpSec", "10"));
+    int thinkMs     = Integer.parseInt(prop("thinkMs", "0")); // 思考时间（ms），可为 0
+
+    int connectTimeoutMs = Integer.parseInt(prop("connectTimeoutMs", "2000"));
+    int readTimeoutMs    = Integer.parseInt(prop("readTimeoutMs", "5000"));
+    int expectStatus     = Integer.parseInt(prop("expectStatus", "200"));
+
+    String reportDir  = prop("reportDir", "target/jmeter-report");
+    String baseUrl    = protocol + "://" + host + ":" + port;
+
+    // ---- 公共配置（等价 JMeter 的 HTTP Request Defaults / Headers）----
+    var defaults = httpDefaults()
+        .url(baseUrl)
+        .connectionTimeout(Duration.ofMillis(connectTimeoutMs))
+        .responseTimeout(Duration.ofMillis(readTimeoutMs));
+
+    var headers = httpHeaders().header("Content-Type", contentType);
+
+    // ---- HTTP Sampler（根据方法自动设置 body）----
+    var sampler = httpSampler(path).method(method.toUpperCase());
+    if (hasBody(method)) {
+      sampler = sampler.body(body);
+    }
+
+    // ---- 构造测试计划：线程组（含 RampUp）、循环次数、定时器、断言、汇总 ----
+    var plan = testPlan(
+        defaults,
+        headers,
+        // 线程组：threads × loops，并设置阶梯升压（rampUpSec）
+        threadGroup("perf-users", threads, loops)
+            .rampToAndHold(threads, Duration.ofSeconds(rampUpSec), Duration.ZERO)
+            .children(
+                sampler,
+                // 思考时间（可选）
+                (thinkMs > 0 ? constantTimer(thinkMs) : null),
+                // 断言：HTTP 状态码
+                responseAssertion()
+                  .testField(ResponseField.RESPONSE_CODE)
+                  .equalsTo(String.valueOf(expectStatus))
+            ),
+        summaryStats() // 控制台聚合
+    );
+
+    var stats = plan.run();
+    // 保存 JTL 与 HTML 报告（便于查看“统计/分位数/错误率/吞吐”）
+    stats.saveAsJtl("target/jmeter/results.jtl");
+    stats.saveHtmlReport(reportDir);
+
+    // 简单门禁：错误率或 P95 超阈值可在此抛错让 CI 失败（按需开启）
+    // if (stats.overall().errorsPercent() > 1.0 || stats.overall().perc95() > 1500) {
+    //   throw new AssertionError("Performance gate failed");
+    // }
+  }
+
+  private static String prop(String key, String def) {
+    return System.getProperty(key, def);
+  }
+  private static boolean hasBody(String method) {
+    String m = method.toUpperCase();
+    return m.equals("POST") || m.equals("PUT") || m.equals("PATCH");
+  }
+}
