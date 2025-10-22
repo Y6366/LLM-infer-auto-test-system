@@ -1,0 +1,169 @@
+shop-service/
+├─ pom.xml
+├─ README.md
+├─ .gitignore
+├─ .editorconfig
+├─ Makefile                      # 可选：一键构建/运行
+├─ Dockerfile                    # 可选：服务容器
+├─ docker-compose.yml            # 可选：MySQL/Redis 本地编排
+├─ scripts/
+│  ├─ dev-up.sh                  # 启动本地 MySQL/Redis
+│  └─ init-db.sql                # 初始化脚本（或用 Flyway）
+└─ src/
+   ├─ main/
+   │  ├─ java/com/example/shop/
+   │  │  ├─ ShopApplication.java
+   │  │  ├─ api/                 # 对外接口层（Controller + DTO/VO）
+   │  │  │  ├─ controller/
+   │  │  │  │  ├─ OrderController.java
+   │  │  │  │  └─ HealthController.java
+   │  │  │  ├─ dto/              # 入参对象（Cmd/Query）
+   │  │  │  │  └─ CreateOrderCmd.java
+   │  │  │  └─ vo/               # 出参对象（View/VO）
+   │  │  │     └─ OrderCreatedVo.java
+   │  │  ├─ common/              # 通用：统一响应、错误码、异常、工具
+   │  │  │  ├─ response/
+   │  │  │  │  └─ ApiResponse.java          # 统一响应（前面给过）
+   │  │  │  ├─ error/
+   │  │  │  │  ├─ ErrorCode.java            # 业务错误码枚举
+   │  │  │  │  └─ BizException.java         # 业务异常
+   │  │  │  ├─ util/
+   │  │  │  │  ├─ IdUtil.java               # 雪花ID/UUID 工具
+   │  │  │  │  ├─ JsonUtil.java             # Jackson 封装
+   │  │  │  │  └─ DateTimeUtil.java
+   │  │  │  └─ constants/
+   │  │  │     └─ AppConsts.java            # 常量、Header 名等
+   │  │  ├─ config/              # 配置（Spring/第三方/中间件）
+   │  │  │  ├─ WebConfig.java               # CORS、拦截器、格式化
+   │  │  │  ├─ JacksonConfig.java           # 序列化配置（驼峰/时间）
+   │  │  │  ├─ MyBatisConfig.java           # 分页、驼峰、别名等
+   │  │  │  ├─ RedisConfig.java             # 序列化、模板、缓存
+   │  │  │  ├─ SwaggerConfig.java           # 可选：OpenAPI/Knife4j
+   │  │  │  └─ TraceFilter.java             # X-Request-Id/TraceId 过滤器
+   │  │  ├─ domain/              # 领域模型（Entity/聚合/领域服务）
+   │  │  │  ├─ entity/
+   │  │  │  │  ├─ Order.java
+   │  │  │  │  └─ OrderItem.java
+   │  │  │  └─ service/
+   │  │  │     ├─ OrderDomainService.java   # 复杂领域规则（可选）
+   │  │  │     └─ impl/ (可选)
+   │  │  ├─ repository/          # 仓储接口抽象（可选）
+   │  │  │  └─ OrderRepository.java         # 屏蔽 MyBatis 细节
+   │  │  ├─ infra/               # 基础设施实现（MyBatis/Redis/Kafka/外部接口）
+   │  │  │  ├─ mapper/                       # MyBatis Mapper 接口
+   │  │  │  │  ├─ OrderMapper.java
+   │  │  │  │  └─ OrderItemMapper.java
+   │  │  │  ├─ repository/impl/             # Repository 实现（封装 mapper）
+   │  │  │  │  └─ OrderRepositoryImpl.java
+   │  │  │  ├─ client/                       # 外部服务 client（如支付、库存）
+   │  │  │  │  └─ InventoryClient.java
+   │  │  │  └─ redis/                        # Redis 访问封装
+   │  │  │     └─ OrderCache.java
+   │  │  ├─ app/                 # 应用服务（用例编排、事务、集成）
+   │  │  │  ├─ command/                      # 命令对象（可选，或放 dto）
+   │  │  │  ├─ query/                        # 查询对象（可选）
+   │  │  │  └─ OrderAppService.java          # createOrder / payCallback 等
+   │  │  └─ support/             # 横切：AOP/异常处理/拦截器/转换器
+   │  │     ├─ advice/
+   │  │     │  └─ GlobalExceptionHandler.java  # @ControllerAdvice -> ApiResponse
+   │  │     ├─ interceptor/
+   │  │     │  └─ AuthInterceptor.java
+   │  │     └─ aspect/
+   │  │        └─ LoggingAspect.java         # 可选：审计/日志切面
+   │  └─ resources/
+   │     ├─ application.yml                   # 公共配置
+   │     ├─ application-dev.yml               # 本地开发（MySQL/Redis）
+   │     ├─ application-prod.yml              # 生产（连接池/超时/日志级别）
+   │     ├─ mapper/                           # MyBatis XML（与接口同名）
+   │     │  ├─ OrderMapper.xml
+   │     │  └─ OrderItemMapper.xml
+   │     ├─ db/migration/                     # Flyway/Liquibase（推荐）
+   │     │  ├─ V1__init_order_tables.sql
+   │     │  └─ V2__add_order_index.sql
+   │     ├─ static/                           # 静态资源（如需）
+   │     └─ templates/                        # Thymeleaf（如需）
+   └─ test/java/com/example/shop/
+      ├─ api/OrderControllerTest.java         # WebMvcTest/RestAssured
+      ├─ app/OrderAppServiceTest.java         # 业务单测
+      ├─ infra/mapper/OrderMapperTest.java    # MyBatis 映射测试
+      └─ BaseIntegrationTest.java             # @SpringBootTest + Testcontainers（可选）
+
+
+
+关键目录与文件职责说明
+
+1、api/
+
+controller/：暴露 REST 接口，仅做参数校验、鉴权入口、调用应用服务、返回统一响应。
+
+dto/：入参对象（Create/Update 命令、分页查询条件等）。
+
+vo/：出参对象（列表项、详情视图等）。
+
+2、common/
+
+response/ApiResponse.java：统一响应模型（前面已提供）。
+
+error/ErrorCode.java：错误码枚举（模块化前缀，如 ORD_）。
+
+error/BizException.java：业务异常，配合全局异常处理返回统一格式。
+
+util/：通用工具类（ID 生成、JSON、时间）。
+
+constants/AppConsts.java：系统常量（Header/缓存前缀/分页默认值）。
+
+3、config/
+
+WebConfig：CORS、消息转换器、拦截器注册。
+
+JacksonConfig：时间格式（ISO 8601）、空值策略、枚举序列化。
+
+MyBatisConfig：@MapperScan、驼峰映射、分页插件（PageHelper/MyBatis-Plus 二选一）。
+
+RedisConfig：连接工厂与模板、Key/Value 序列化策略（推荐 JSON）。
+
+TraceFilter：生成/透传 X-Request-Id，写入 MDC，回传到 ApiResponse.requestId。
+
+4、domain/
+
+entity/：与业务概念一致的实体（不直接暴露数据库细节）。
+
+service/：复杂领域规则、聚合内不变式（可选，简单场景可不拆）。
+
+5、repository/ & infra/
+
+infra/mapper/：MyBatis Mapper 接口（与 XML 一一对应）。
+
+resources/mapper/：SQL 与 ResultMap，建议显式字段映射，避免 *。
+
+infra/repository/impl/：对外实现 OrderRepository，屏蔽 MyBatis 明细，便于未来替换存储。
+
+infra/redis/：缓存封装，统一 Key 设计与 TTL 策略（Cache-Aside）。
+
+6、app/
+
+应用服务，编排用例：事务边界、调用仓储/外部服务、发布事件、填充 VO；不写 Controller 逻辑和 SQL。
+
+7、support/
+
+advice/GlobalExceptionHandler：将 ConstraintViolationException、MethodArgumentNotValidException、BizException 等转为 ApiResponse.error(...)。
+
+interceptor/AuthInterceptor：JWT 鉴权、权限校验、租户透传等。
+
+aspect/LoggingAspect：请求/响应/耗时日志（注意脱敏）。
+
+8、resources/application-*.yml
+
+application.yml：通用配置（server、logging、jackson、spring.profiles.active）。
+
+application-dev.yml：spring.datasource（HikariCP）、spring.redis、mybatis（mapperLocations、type-aliases-package）。
+
+application-prod.yml：连接池大小、超时、日志级别、management 暴露指标。
+
+9、db/migration/
+
+使用 Flyway 管理 DDL/DML 变更，确保可回放和可审计。
+
+10、test/
+
+单测与集成测试；建议引入 Testcontainers（MySQL/Redis）保证一致性。

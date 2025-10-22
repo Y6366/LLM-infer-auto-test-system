@@ -1,0 +1,70 @@
+1、总览与约定
+
+版本策略（Semantic Versioning/日期版）、环境与网关地址、命名规范
+
+认证与授权（Token/OAuth2/JWT/签名）、权限模型
+
+协议与格式（HTTP/REST、RPC/gRPC、GraphQL、消息队列）、序列化（JSON/Protobuf）
+
+速率限制/配额、幂等与重试、超时与重试退避、去重键
+
+全局错误码规范与错误载荷结构（code、message、details、traceId）
+
+分页/排序/过滤器规范（page/size、cursor、order、筛选语法）
+
+安全（字段脱敏、加密字段、重放防护）、兼容与弃用策略、变更日志（Changelog）
+
+2、资源/方法定义（逐条接口）
+
+标题与用途、调用时机与前置条件
+
+请求：方法/路径、Headers、Query/Path 参数、Body 模型（字段/类型/约束/默认/是否必填/枚举/校验规则/示例）
+
+响应：状态码、Body 模型（同上）、业务错误与重试建议
+
+示例：最小请求、标准请求、错误请求、典型响应示例
+
+幂等设计：幂等键、可重试条件
+
+一致性/事务：强/最终一致、去重策略、补偿/回滚机制
+
+可观测性：日志关键字段、traceId/spanId、重要指标
+
+3、事件/回调（如有）
+
+事件名、触发条件、Payload、签名与重试、订阅/取消订阅流程
+
+4、协议差异提示
+
+REST：资源建模、状态码语义、PATCH 语义
+
+gRPC/RPC：Service/Method、Proto 定义、流式语义、错误码映射
+
+GraphQL：Schema/Query/Mutation/订阅、N+1/分页指引、字段可空策略
+
+
+
+0. 概览：环境/网关、版本策略、认证授权、速率限制、幂等与重试、全局错误码
+1. 资源：/orders
+   - POST /orders
+     - 请求头/Query/Body（字段/类型/必填/校验/默认/示例）
+     - 响应200/4xx/5xx结构与示例
+     - 幂等等：Idempotency-Key、重试建议
+     - 观测：traceId、关键日志字段
+   - GET /orders/{id} ...
+2. 分页/排序/过滤规范（统一说明）
+3. 回调与事件（如：订单状态变更Webhook）
+4. 兼容/弃用策略与变更日志
+
+
+# API 规格（v1）
+
+## 0. 全局约定
+- 网关：`https://api.example.com`
+- 认证：`Authorization: Bearer <JWT>`；管理接口需 `role=admin`
+- 幂等：`Idempotency-Key`（客户端生成 UUID；服务端 24h 去重）
+- 超时与重试：客户端超时 3s；网络超时可重试，业务错误不重试
+- 分页：`page`（1 基）、`size`（默认 20，最大 100）；或 `cursor` 游标
+- 错误结构：
+```json
+{ "code": "ORD_XXX", "message": "xxx", "traceId": "..." , "details": { "field":"reason" } }
