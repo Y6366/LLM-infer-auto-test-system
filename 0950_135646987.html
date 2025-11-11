@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head>
+  <meta charset="utf-8"/>
+  <link href="https://blog.csdn.net/qq_45515182/article/details/135646987" rel="canonical"/>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+  <meta content="webkit" name="renderer">
+   <meta content="webkit" name="force-rendering">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+    <meta content="always" name="referrer"/>
+    <meta content="no-siteapp" http-equiv="Cache-Control">
+     <link href="#" media="handheld" rel="alternate"/>
+     <meta content="pc" name="applicable-device"/>
+     <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"/>
+     <title>
+      万字讲解新一代分布式任务调度框架Power-job-CSDN博客
+     </title>
+     <meta content="power-job" name="keywords"/>
+     <meta content='{"autorun":true,"install":true,"keyword":"power-job"}' name="csdn-baidu-search"/>
+     <meta content="文章浏览阅读5.4k次，点赞28次，收藏40次。PowerJob是一个功能强大的分布式任务调度平台，用于构建数据驱动的应用程序。它提供了简单易用的API和可视化的界面，让用户能够轻松地创建、管理和调度任务。本文通过近两万字带你实现PowerJob下载、使用、部署三方面的内容，内容详细、案例简单。_power-job" name="description"/>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-6fdc7e4913.min.css" rel="stylesheet" type="text/css"/>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin-shirtblue/skin-shirtblue-b2ba816980.min.css" rel="stylesheet" type="text/css"/>
+     <meta content='{"type":"0","fixModel":"1"}' name="toolbar"/>
+     <link href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css" rel="stylesheet" type="text/css"/>
+     <style>
+      .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+     </style>
+    </meta>
+   </meta>
+  </meta>
+  <style type="text/css">
+   * { user-select: text; } pre{max-height: none!important; overflow-y: hidden;}
+  </style>
+ </head>
+ <body class="nodata" style="">
+  <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css" rel="stylesheet"/>
+  <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css" rel="stylesheet">
+   <link href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css" rel="stylesheet">
+    <div class="main_father clearfix d-flex justify-content-center mainfather-concision" style="height:100%;">
+     <div class="container clearfix container-concision" id="mainBox">
+      <main>
+       <div class="blog-content-box">
+        <div class="article-header-box">
+         <div class="article-header">
+          <div class="article-title-box">
+           <h1 class="title-article" id="articleContentId">
+            万字讲解新一代分布式任务调度框架Power-job
+           </h1>
+          </div>
+          <div class="article-info-box">
+           <div class="article-bar-top-box">
+            <div class="article-bar-top">
+             <img alt="" class="article-type-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/original.png"/>
+             <div class="bar-content">
+              <a class="article-vip-box" data-report-click='{"spm":"3001.10404"}' data-report-query="spm=3001.10404" data-report-view='{"spm":"3001.10404"}' href="https://mall.csdn.net/vip" target="_blank">
+               <img alt="" class="article-vip-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/identityVipNew.png"/>
+              </a>
+              <a class="follow-nickName" href="https://blog.csdn.net/qq_45515182" rel="noopener" target="_blank" title="中国胖子风清扬">
+               中国胖子风清扬
+              </a>
+              <img alt="" class="article-time-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newCurrentTime2.png"/>
+              <span class="time">
+               于 2024-01-18 22:31:48 发布
+              </span>
+              <div class="read-count-box">
+               <img alt="" class="article-read-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/articleReadEyes2.png"/>
+               <span class="read-count">
+                阅读量5.4k
+               </span>
+               <a class="un-collection" data-report-click='{"mod":"popu_823","spm":"1001.2101.3001.4232","ab":"new"}' id="blog_detail_zk_collection">
+                <img alt="" class="article-collect-img article-heard-img un-collect-status isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect2.png" style="display:inline-block"/>
+                <img alt="" class="article-collect-img article-heard-img collect-status isactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive2.png" style="display:none"/>
+                <span class="name">
+                 收藏
+                </span>
+                <span class="get-collection">
+                 40
+                </span>
+               </a>
+               <div class="read-count-box is-like" data-type="top">
+                <img alt="" class="article-read-img article-heard-img" id="is-like-imgactive-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Active.png" style="display:none"/>
+                <img alt="" class="article-read-img article-heard-img" id="is-like-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Black.png" style="display:block"/>
+                <span class="read-count" id="blog-digg-num">
+                 点赞数
+                              28
+                </span>
+               </div>
+              </div>
+             </div>
+            </div>
+            <div class="operating">
+             <a class="href-article-edit slide-toggle">
+              CC 4.0 BY-SA版权
+             </a>
+            </div>
+           </div>
+           <div class="blog-tags-box">
+            <div class="tags-box artic-tag-box">
+             <span class="label">
+              分类专栏：
+             </span>
+             <a class="tag-link" href="https://blog.csdn.net/qq_45515182/category_12449847.html" rel="noopener" target="_blank">
+              分布式
+             </a>
+             <span class="label">
+              文章标签：
+             </span>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"spring boot","ab":"new","extra":"{\"searchword\":\"spring boot\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"spring boot","ab":"new","extra":"{\"searchword\":\"spring boot\"}"}' href="https://so.csdn.net/so/search/s.do?q=spring+boot&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              spring boot
+             </a>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"spring cloud","ab":"new","extra":"{\"searchword\":\"spring cloud\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"spring cloud","ab":"new","extra":"{\"searchword\":\"spring cloud\"}"}' href="https://so.csdn.net/so/search/s.do?q=spring+cloud&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              spring cloud
+             </a>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"微服务","ab":"new","extra":"{\"searchword\":\"微服务\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"微服务","ab":"new","extra":"{\"searchword\":\"微服务\"}"}' href="https://so.csdn.net/so/search/s.do?q=%E5%BE%AE%E6%9C%8D%E5%8A%A1&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              微服务
+             </a>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"分布式","ab":"new","extra":"{\"searchword\":\"分布式\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"分布式","ab":"new","extra":"{\"searchword\":\"分布式\"}"}' href="https://so.csdn.net/so/search/s.do?q=%E5%88%86%E5%B8%83%E5%BC%8F&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              分布式
+             </a>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"docker","ab":"new","extra":"{\"searchword\":\"docker\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"docker","ab":"new","extra":"{\"searchword\":\"docker\"}"}' href="https://so.csdn.net/so/search/s.do?q=docker&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              docker
+             </a>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"java","ab":"new","extra":"{\"searchword\":\"java\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"java","ab":"new","extra":"{\"searchword\":\"java\"}"}' href="https://so.csdn.net/so/search/s.do?q=java&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              java
+             </a>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"中间件","ab":"new","extra":"{\"searchword\":\"中间件\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"中间件","ab":"new","extra":"{\"searchword\":\"中间件\"}"}' href="https://so.csdn.net/so/search/s.do?q=%E4%B8%AD%E9%97%B4%E4%BB%B6&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              中间件
+             </a>
+            </div>
+           </div>
+           <div class="slide-content-box">
+            <div class="article-copyright">
+             <div class="creativecommons">
+              版权声明：本文为博主原创文章，遵循
+              <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">
+               CC 4.0 BY-SA
+              </a>
+              版权协议，转载请附上原文出处链接和本声明。
+             </div>
+             <div class="article-source-link">
+              本文链接：
+              <a href="https://blog.csdn.net/qq_45515182/article/details/135646987" target="_blank">
+               https://blog.csdn.net/qq_45515182/article/details/135646987
+              </a>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="" id="blogHuaweiyunAdvert">
+        </div>
+        <article class="baidu_pl">
+         <div class="article_content clearfix" id="article_content">
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css" rel="stylesheet"/>
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-8d6d398833.css" rel="stylesheet"/>
+          <div class="markdown_views prism-atom-one-dark" id="content_views">
+           <svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+           </svg>
+           <h2>
+            <a id="1_0">
+            </a>
+            1、简介
+           </h2>
+           <p>
+            <font color="red">
+             Power-Job 的设计目标是成为企业级的分布式任务调度平台
+            </font>
+            ，整个公司统一部署调度中心 power-job-server，旗下所有业务线应用只需要依赖 power-job-worker 即可接入调度中心获取任务调度与分布式计算能力。
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/070136e33c51114e8e97d977bdc27491.jpeg#pic_center"/>
+           </p>
+           <p>
+            <a href="http://www.powerjob.tech/" rel="nofollow">
+             Power-job官方网址：http://www.powerjob.tech/
+            </a>
+           </p>
+           <h3>
+            <a id="11_7">
+            </a>
+            1.1、同类相比
+           </h3>
+           <p>
+            当前市面上流行的任务调度框架有：xxl-job、QuartZ以及Power-job。
+            <br/>
+            主要功能相比较如下：
+           </p>
+           <table>
+            <thead>
+             <tr>
+              <th>
+              </th>
+              <th>
+               xxl-job
+              </th>
+              <th>
+               QuartZ
+              </th>
+              <th>
+               Power-job
+              </th>
+             </tr>
+            </thead>
+            <tbody>
+             <tr>
+              <td>
+               定时类型
+              </td>
+              <td>
+               CRON
+              </td>
+              <td>
+               CRON
+              </td>
+              <td>
+               CRON、固定频率、固定延迟、OpenAPI
+              </td>
+             </tr>
+             <tr>
+              <td>
+               任务类型
+              </td>
+              <td>
+               内置Java 内置Java、GLUE Java、Shell、Python等脚本
+              </td>
+              <td>
+               内置Java
+              </td>
+              <td>
+               内置Java、外置Java（容器）、Shell、Python等脚本
+              </td>
+             </tr>
+             <tr>
+              <td>
+               分布式任务
+              </td>
+              <td>
+               静态分片
+              </td>
+              <td>
+               无
+              </td>
+              <td>
+               MapReduce 动态分片
+              </td>
+             </tr>
+             <tr>
+              <td>
+               在线任务治理
+              </td>
+              <td>
+               支持
+              </td>
+              <td>
+               不支持
+              </td>
+              <td>
+               支持
+              </td>
+             </tr>
+             <tr>
+              <td>
+               调度方式及性能
+              </td>
+              <td>
+               基于数据库锁，有性能瓶颈
+              </td>
+              <td>
+               基于数据库锁，有性能瓶颈
+              </td>
+              <td>
+               无锁化设计(CAS)，性能强劲无上限
+              </td>
+             </tr>
+             <tr>
+              <td>
+               报警监控
+              </td>
+              <td>
+               邮件
+              </td>
+              <td>
+               无
+              </td>
+              <td>
+               邮件，提供接口允许开发者扩展
+              </td>
+             </tr>
+            </tbody>
+           </table>
+           <p>
+            综上观察，Power-job在一定的程度上是优于xxl-job的，但是具体的应用还得看具体的需求，如果只是一些简单的需求，使用xxl-job或者QuartZ都是可以的。
+            <br/>
+            在学习路线上可以从
+            <code>
+             QuartZ -&gt; xxl-job -&gt; Power-job
+            </code>
+            ，由简入难。
+           </p>
+           <h3>
+            <a id="12Powerjob_22">
+            </a>
+            1.2、Power-job架构
+           </h3>
+           <p>
+            <img alt="power-job架构图" src="https://i-blog.csdnimg.cn/blog_migrate/fd59f9b5c257dc34b460eaca4ea6b040.jpeg#pic_center">
+             <br/>
+             从架构图中大致可以了解到系统分为三个模块：
+            </img>
+           </p>
+           <ol>
+            <li>
+             <font color="red">
+              <strong>
+               调度中心 power-job-server
+              </strong>
+             </font>
+             ​​：PowerJob的设计目标为企业级的分布式任务调度平台，即成为调度中间件，让任意业务线的应用仅需要依赖 powerjob-worker 即可获取任务调度与分布式计算的能力。因此，PowerJob 的理想部署模式为一个公司统一部署 powerjob-server 集群，各业务线应用直接接入使用。
+            </li>
+            <li>
+             ​​
+             <font color="red">
+              <strong>
+               执行器 power-job-worker​​
+              </strong>
+             </font>
+             ：根据以前对定时任务的理解，用过Quartz的话，这里相当于Job这个接口；用过ElasticJob的话，最起码相当于Job接口中的一种，比如SimpleJob接口；用过xxl-job的话，这里也是同理，相当于使用了注解​​@XxlJob​​的方法。
+            </li>
+            <li>
+             <font color="red">
+              <strong>
+               ​​Akka ActorSystem​​
+              </strong>
+             </font>
+             ：基于Actor模型设计的，专用于构建高度并发、分布式和弹性的工具包，号称单台机器上高达 200 亿条消息/秒。从架构图来看，PowerJob用来做数据交换传输，
+             <font color="orange">
+              需要单独占据一个端口。
+             </font>
+            </li>
+           </ol>
+           <h3>
+            <a id="13Powerjobserver_30">
+            </a>
+            1.3、启动Powerjob-server
+           </h3>
+           <p>
+            （1）因为Power-Job是开源的项目并且在Docker中暂时还无法找到，所以需要我们先下载源码，下载地址可以是Github或者Gitee：
+            <br/>
+            <a href="https://gitee.com/KFCFans/PowerJob?_from=gitee_search" rel="nofollow">
+             Power-job下载连接：https://gitee.com/KFCFans/PowerJob?_from=gitee_search
+            </a>
+           </p>
+           <p>
+            （2）导入开发工具并配置数据库
+            <br/>
+            配置数据库需要修改
+            <code>
+             powerjob-server
+            </code>
+            模块下
+            <code>
+             powerjob-server-starter
+            </code>
+            子模块的
+            <code>
+             application-daily.properties
+            </code>
+            配置文件中的数据库信息：
+           </p>
+           <pre><code class="prism language-sql"><span class="token comment">####### Database properties(Configure according to the the environment) #######</span>
+spring<span class="token punctuation">.</span>datasource<span class="token punctuation">.</span>core<span class="token punctuation">.</span>driver<span class="token operator">-</span>class<span class="token operator">-</span>name<span class="token operator">=</span>com<span class="token punctuation">.</span>mysql<span class="token punctuation">.</span>cj<span class="token punctuation">.</span>jdbc<span class="token punctuation">.</span>Driver
+spring<span class="token punctuation">.</span>datasource<span class="token punctuation">.</span>core<span class="token punctuation">.</span>jdbc<span class="token operator">-</span>url<span class="token operator">=</span>jdbc:mysql:<span class="token comment">//localhost:3306/powerjob-daily?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai</span>
+spring<span class="token punctuation">.</span>datasource<span class="token punctuation">.</span>core<span class="token punctuation">.</span>username<span class="token operator">=</span>root
+spring<span class="token punctuation">.</span>datasource<span class="token punctuation">.</span>core<span class="token punctuation">.</span>password<span class="token operator">=</span><span class="token number">123456</span>
+spring<span class="token punctuation">.</span>datasource<span class="token punctuation">.</span>core<span class="token punctuation">.</span>maximum<span class="token operator">-</span>pool<span class="token operator">-</span>size<span class="token operator">=</span><span class="token number">20</span>
+spring<span class="token punctuation">.</span>datasource<span class="token punctuation">.</span>core<span class="token punctuation">.</span>minimum<span class="token operator">-</span>idle<span class="token operator">=</span><span class="token number">5</span>
+
+<span class="token comment">####### Storage properties(Delete if not needed)  #######</span>
+<span class="token comment">#oms.storage.dfs.mongodb.uri=mongodb+srv://zqq:No1Bug2Please3!@cluster0.wie54.gcp.mongodb.net/powerjob_daily?retryWrites=true&amp;w=majority</span>
+oms<span class="token punctuation">.</span>storage<span class="token punctuation">.</span>dfs<span class="token punctuation">.</span>mysql_series<span class="token punctuation">.</span>driver<span class="token operator">=</span>com<span class="token punctuation">.</span>mysql<span class="token punctuation">.</span>cj<span class="token punctuation">.</span>jdbc<span class="token punctuation">.</span>Driver
+oms<span class="token punctuation">.</span>storage<span class="token punctuation">.</span>dfs<span class="token punctuation">.</span>mysql_series<span class="token punctuation">.</span>url<span class="token operator">=</span>jdbc:mysql:<span class="token comment">//localhost:3306/powerjob-daily?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai</span>
+oms<span class="token punctuation">.</span>storage<span class="token punctuation">.</span>dfs<span class="token punctuation">.</span>mysql_series<span class="token punctuation">.</span>username<span class="token operator">=</span>root
+oms<span class="token punctuation">.</span>storage<span class="token punctuation">.</span>dfs<span class="token punctuation">.</span>mysql_series<span class="token punctuation">.</span>password<span class="token operator">=</span><span class="token number">123456</span>
+oms<span class="token punctuation">.</span>storage<span class="token punctuation">.</span>dfs<span class="token punctuation">.</span>mysql_series<span class="token punctuation">.</span>auto_create_table<span class="token operator">=</span><span class="token boolean">true</span>
+</code></pre>
+           <p>
+            其次再在数据库中将
+            <code>
+             powerjob-daily
+            </code>
+            数据库创建好，启动
+            <code>
+             powerjob-server-starter
+            </code>
+            模块，Power-Job底层是基于JPA，系统会自动创建所需要的表。
+           </p>
+           <p>
+            启动项目：
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/256f28bf81484c48e9ad30e08e4c482f.png">
+             <br/>
+             <font color="red">
+              在使用PowerJob时，无论是调度中心还是执行器，控制台都会不断的有日志输入，如果不想有日志，可以在配置文件中使用
+              <code>
+               logging.level.root=off
+              </code>
+              来关闭日志输出。
+             </font>
+            </img>
+           </p>
+           <p>
+            系统自动创建表：
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/9083d3e2c529af1d74dbef6248266229.png">
+             <br/>
+             访问前端：
+             <br/>
+             在浏览器中输入
+             <code>
+              http://localhost:7700
+             </code>
+             就可以进入Power-job的前端页面。
+             <br/>
+             <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/7818fd178cd0f20d13a5812c4f2fe58c.png"/>
+            </img>
+           </p>
+           <h2>
+            <a id="2Powerjob_Worker_66">
+            </a>
+            2、Power-job Worker执行器
+           </h2>
+           <p>
+            在使用XXL-JOB的时候，我们会使用@XxlJob注解来从侧面进行任务的执行，一个类中可以存在多个@XxlJob注解，也就是会存在多个需要执行的任务。
+            <br/>
+            但是在Power-Job中，如果不使用@PowerJobHandler注解的话，就需要执行任务的类去实现
+            <code>
+             BasicProcessor
+            </code>
+            处理策略接口，接口内部有一个任务执行的方法
+            <code>
+             process
+            </code>
+            。
+           </p>
+           <pre><code class="prism language-java"><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">BasicProcessor</span> <span class="token punctuation">{<!-- --></span>
+
+    <span class="token comment">/**
+     * 核心处理逻辑
+     * 可通过 {@link TaskContext#getWorkflowContext()} 方法获取工作流上下文
+     *
+     * @param context 任务上下文，可通过 jobParams 和 instanceParams 分别获取控制台参数和OpenAPI传递的任务实例参数
+     * @return 处理结果，msg有长度限制，超长会被裁剪，不允许返回 null
+     * @throws  Exception 异常，允许抛出异常，但不推荐，最好由业务开发者自己处理
+     */</span>
+    <span class="token class-name">ProcessResult</span> <span class="token function">process</span><span class="token punctuation">(</span><span class="token class-name">TaskContext</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+           <p>
+            通过
+            <code>
+             BasicProcessor
+            </code>
+            接口衍生出了另外几中类型的任务处理策略：
+           </p>
+           <ol>
+            <li>
+             <font color="red">
+              <strong>
+               BroadcastProcessor 广播处理器
+              </strong>
+             </font>
+             ：广播执行的策略下，所有机器都会被调度执行该任务。为了便于资源的准备和释放，广播处理器在​​BasicProcessor​​ 的基础上额外增加了 ​​preProcess​​ 和 ​​postProcess​​ 方法，分别在整个集群开始之前/结束之后选一台机器执行相关方法。
+            </li>
+            <li>
+             <font color="red">
+              <strong>
+               MapReduceProcessor 并行处理器
+              </strong>
+             </font>
+             ：MapReduce 是最复杂也是最强大的一种执行器，它允许开发者完成任务的拆分，将子任务派发到集群中其他Worker 执行，是执行大批量处理任务的首选。
+            </li>
+            <li>
+             <font color="red">
+              <strong>
+               MapProcessor Map处理器
+              </strong>
+             </font>
+             ：对应了Map任务，即某个任务在运行过程中，允许产生子任务并分发到其他机器进行运算。
+            </li>
+           </ol>
+           <p>
+            <font color="red">
+             BasicProcessor默认是单机策略处理器，单机执行的策略下，server 会在所有可用 worker 中选取健康度最佳的机器进行执行。
+            </font>
+           </p>
+           <p>
+            TaskContext类的基本属性：
+           </p>
+           <table>
+            <thead>
+             <tr>
+              <th>
+               属性名称
+              </th>
+              <th>
+               描述
+              </th>
+             </tr>
+            </thead>
+            <tbody>
+             <tr>
+              <td>
+               jobId
+              </td>
+              <td>
+               任务 ID，开发者一般无需关心此参数
+              </td>
+             </tr>
+             <tr>
+              <td>
+               instanceId
+              </td>
+              <td>
+               任务实例 ID，全局唯一，开发者一般无需关心此参数
+              </td>
+             </tr>
+             <tr>
+              <td>
+               subInstanceId
+              </td>
+              <td>
+               子任务实例 ID，秒级任务使用，开发者一般无需关心此参数
+              </td>
+             </tr>
+             <tr>
+              <td>
+               taskId
+              </td>
+              <td>
+               采用链式命名法的 ID，在某个任务实例内唯一，开发者一般无需关心此参数
+              </td>
+             </tr>
+             <tr>
+              <td>
+               taskName
+              </td>
+              <td>
+               task 名称，Map/MapReduce 任务的子任务的值为开发者指定，否则为系统默认值，开发者一般无需关心此参数
+              </td>
+             </tr>
+             <tr>
+              <td>
+               jobParams
+              </td>
+              <td>
+               任务参数对于非工作流中的任务其值等同于控制台录入的任务参数； 如果该任务为工作流中的任务且有配置节点参数信息，那么接收到的是节点配置的参数信息
+              </td>
+             </tr>
+             <tr>
+              <td>
+               instanceParams
+              </td>
+              <td>
+               任务实例参数对于非工作流中的任务 其值 等同于 OpenAPI 传递的实例参数，非 OpenAPI 触发的任务则一定为空。 如果该任务为工作流中的任务那么这里实际接收到的是工作流上下文信息，建议使用 getWorkflowContext 方法获取上下文信息
+              </td>
+             </tr>
+             <tr>
+              <td>
+               maxRetryTimes
+              </td>
+              <td>
+               Task 的最大重试次数
+              </td>
+             </tr>
+             <tr>
+              <td>
+               currentRetryTimes
+              </td>
+              <td>
+               Task 的当前重试次数，和 maxRetryTimes 联合起来可以判断当前是否为该 Task 的最后一次运行机会
+              </td>
+             </tr>
+             <tr>
+              <td>
+               subTask
+              </td>
+              <td>
+               子 Task，Map/MapReduce 处理器专属，开发者调用map方法时传递的子任务列表中的某一个
+              </td>
+             </tr>
+             <tr>
+              <td>
+               omsLogger
+              </td>
+              <td>
+               在线日志，用法同 Slf4J，记录的日志可以直接通过控制台查看，非常便捷和强大！不过使用过程中需要注意频率，滥用在线日志会对 Server 造成巨大的压力
+              </td>
+             </tr>
+             <tr>
+              <td>
+               userContext
+              </td>
+              <td>
+               用户在 PowerJobWorkerConfig 中设置的自定义上下文
+              </td>
+             </tr>
+             <tr>
+              <td>
+               workflowContext
+              </td>
+              <td>
+               工作流WorkflowContext对象
+              </td>
+             </tr>
+            </tbody>
+           </table>
+           <h3>
+            <a id="21Cron_109">
+            </a>
+            2.1、Cron表达式
+           </h3>
+           <p>
+            cron表达式是一种用于指定任务在某个时间点或周期性执行的字符串表达式。
+            <font color="red">
+             它包含6个或7个域，每个域代表不同的含义，从左到右依次为"秒 分 时 日 月 星期 年"，其中年不是必须的;
+            </font>
+            cron表达式的配置简洁方便，因此在定时调度任务中被广泛使用;
+           </p>
+           <blockquote>
+            <p>
+             秒（0-59）
+             <br/>
+             分钟（0-59）
+             <br/>
+             小时（0-23）
+             <br/>
+             日（1-31）
+             <br/>
+             月（1-12 或 JAN-DEC）
+             <br/>
+             星期（0-6 或 SUN-SAT）
+             <br/>
+             年（可选，1970-2099）
+            </p>
+           </blockquote>
+           <h4>
+            <a id="211_120">
+            </a>
+            2.1.1、特殊符号
+           </h4>
+           <table>
+            <thead>
+             <tr>
+              <th>
+               符号
+              </th>
+              <th>
+               含义
+              </th>
+             </tr>
+            </thead>
+            <tbody>
+             <tr>
+              <td>
+               *
+              </td>
+              <td>
+               通配符，匹配任意值，例如* * * * * ?表示每秒执行一次任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               ,
+              </td>
+              <td>
+               列表，用于指定多个取值，例如0 0 6,12,18 * * ?表示每天6点、12点和18点执行任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               -
+              </td>
+              <td>
+               范围，用于指定一个范围内的取值，例如0 0 9-17 * * MON-FRI表示周一至周五的9点到17点之间每小时执行一次任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               /
+              </td>
+              <td>
+               步长，用于指定一个取值的步长，例如0 */30 * * * ?表示每30分钟执行一次任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               ?
+              </td>
+              <td>
+               无意义占位符，用于指定一个字段没有具体的取值，只能与其他字段一起使用，例如0 0 12 ? * MON-FRI表示周一至周五中午12点执行任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               #
+              </td>
+              <td>
+               日历偏移量，用于指定某个月份的第几个周几，例如0 0 0 ? * 3#1表示每个月的第一个星期三执行任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               L
+              </td>
+              <td>
+               Last，表示某个指定时间内的最后一天，比如0 0 L * * ?表示每月的最后一天执行任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               W
+              </td>
+              <td>
+               Weekday，表示距离指定日期最近的工作日，比如0 0 0 15W * ?表示当月第15个工作日执行任务。如果15号是工作日，则执行任务；如果15号是周末，则任务会提前到最近的工作日即14号执行。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               C
+              </td>
+              <td>
+               Calendar，表示距离指定日期最近的那个日子，比如0 0 0 1W * ?表示当月的第一个工作日执行任务。如果1号是工作日，则执行任务；如果1号是周末，则任务会延后到最近的工作日即2号执行。
+              </td>
+             </tr>
+            </tbody>
+           </table>
+           <p>
+            <font color="red">
+             L只能用在实际单位的前一个单位，比如每月的最后一天，L只能用在日单位上。
+             <br/>
+             W和C的区别在于W只能用在日字段上，表示距离指定日期最近的工作日； 而C可以用在月、日、星期字段上，表示距离指定日期最近的那个日子。
+            </font>
+           </p>
+           <h4>
+            <a id="212_137">
+            </a>
+            2.1.2、举例
+           </h4>
+           <table>
+            <thead>
+             <tr>
+              <th>
+               案例代码
+              </th>
+              <th>
+               含义
+              </th>
+             </tr>
+            </thead>
+            <tbody>
+             <tr>
+              <td>
+               0 0 8 * * *
+              </td>
+              <td>
+               表示每天上午8点执行任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               0 0/30 9-17 * * *
+              </td>
+              <td>
+               表示在每天9点到17点之间，每隔30分钟执行一次任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               0 0 3-5 * * *
+              </td>
+              <td>
+               表示每天凌晨3点到5点之间，每小时执行一次任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               0 0 12 ? * WED
+              </td>
+              <td>
+               表示每周三中午12点执行任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               0 0 10 L * ?
+              </td>
+              <td>
+               表示每个月的最后一天上午10点执行任务。
+              </td>
+             </tr>
+             <tr>
+              <td>
+               0 15 10 L * ?
+              </td>
+              <td>
+               表示每个月的最后一天上午10:15分执行任务。
+              </td>
+             </tr>
+            </tbody>
+           </table>
+           <p>
+            <font color="red">
+             在使用分布式调度框架时，Cron表达式是必须要会的，这是使用前提，Power-job不会像xxl-job一样会提供选择，所以对Cron的使用就会比xxl-job难度要高。
+            </font>
+           </p>
+           <h3>
+            <a id="22_149">
+            </a>
+            2.2、官方案例
+           </h3>
+           <p>
+            在下载的Power-job源码中，官方给出了一个对框架简单使用的案例。
+           </p>
+           <h4>
+            <a id="221_152">
+            </a>
+            2.2.1、项目结构
+           </h4>
+           <p>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/d62098af6ac69fbe8cae6768408c4eac.png"/>
+           </p>
+           <pre><code class="prism language-java">├── <span class="token constant">LICENSE</span>
+├── powerjob<span class="token operator">-</span>client <span class="token comment">// powerjob-client，普通Jar包，提供 OpenAPI</span>
+├── powerjob<span class="token operator">-</span>common <span class="token comment">// 各组件的公共依赖，开发者无需感知</span>
+├── powerjob<span class="token operator">-</span>remote <span class="token comment">// 内部通讯层框架，开发者无需感知</span>
+├── powerjob<span class="token operator">-</span>server <span class="token comment">// powerjob-server，基于SpringBoot实现的调度服务器</span>
+├── powerjob<span class="token operator">-</span>worker <span class="token comment">// powerjob-worker, 普通Jar包，接入powerjob-server的应用需要依赖该Jar包</span>
+├── powerjob<span class="token operator">-</span>worker<span class="token operator">-</span>agent <span class="token comment">// powerjob-agent，可执行Jar文件，可直接接入powerjob-server的代理应用</span>
+├── powerjob<span class="token operator">-</span>worker<span class="token operator">-</span>samples <span class="token comment">// 教程项目，包含了各种Java处理器的编写样例</span>
+├── powerjob<span class="token operator">-</span>worker<span class="token operator">-</span>spring<span class="token operator">-</span>boot<span class="token operator">-</span>starter <span class="token comment">// powerjob-worker 的 spring-boot-starter ，spring boot 应用可以通用引入该依赖一键接入 powerjob-server</span>
+├── powerjob<span class="token operator">-</span>official<span class="token operator">-</span>processors <span class="token comment">// 官方处理器，包含一系列常用的 Processor，依赖该 jar 包即可使用</span>
+├── others
+└── pom<span class="token punctuation">.</span>xml
+</code></pre>
+           <h4>
+            <a id="222_170">
+            </a>
+            2.2.2、启动准备
+           </h4>
+           <p>
+            在直接启动官方案例前，需要做一下前提的准备：
+           </p>
+           <p>
+            （1）修改
+            <code>
+             application.properties
+            </code>
+            配置文件中的
+            <code>
+             powerjob.worker.app-name
+            </code>
+            和
+            <code>
+             powerjob.worker.server-address
+            </code>
+            两个字段，
+            <font color="red">
+             前者表示在调度中心注册的应用名称，后者表示power-job-server的地址，可以用逗号隔开多个调度中心地址。
+            </font>
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/2c37df9799f4b5fd7a09866416d4b612.png"/>
+           </p>
+           <p>
+            （2）在Power-job-server调度中心中注册一个执行器。
+            <br/>
+            在启动了
+            <code>
+             powerjob-server
+            </code>
+            应用后，访问
+            <code>
+             http://localhost:7700
+            </code>
+            。
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/59b1849919e93f323d13b4237d392b6d.png">
+             <br/>
+             注册好之后进行登录进入：
+             <br/>
+             <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/504d6cce5ea2e35beb12eaadb4bc7319.png"/>
+             <br/>
+             启动执行器：
+             <br/>
+             <font color="red">
+              执行器的
+              <code>
+               powerjob.worker.app-name
+              </code>
+              就是注册时的名称。
+             </font>
+             <br/>
+             <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/b8d74973958b32e146424e722b248eb7.png"/>
+             <br/>
+             描述：
+             <br/>
+             <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/69a057b08eff56e9a9ebb0d98bbb0018.png"/>
+            </img>
+           </p>
+           <p>
+            启动成功后，就会在页面中看到执行器的基本信息。
+           </p>
+           <h4>
+            <a id="223_189">
+            </a>
+            2.2.3、编写任务
+           </h4>
+           <p>
+            点击右上角的
+            <code>
+             新建任务
+            </code>
+            ，创建需要执行的任务信息。
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/03a3fd989966112cadd2f3ff4c5274eb.png"/>
+            <br/>
+            填写好基本的任务信息
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/56caceec9303a40b4ea066a31053d275.png"/>
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/63aa8791a5ade762ad1d4679d78ea750.png"/>
+            <br/>
+            （1）定时信息：该任务的触发方式。
+           </p>
+           <ul>
+            <li>
+             API ：不需要填写任何参数，表明该任务由 OpenAPI 触发，不会被调度器主动调度执行
+            </li>
+            <li>
+             CRON：填写 CRON 表达式
+            </li>
+            <li>
+             固定频率： 任务以固定的频率执行，填写整数，单位毫秒
+            </li>
+            <li>
+             固定延迟： 任务以固定的延迟执行，填写整数，单位毫秒
+            </li>
+            <li>
+             每日固定间隔：哪几天的哪些时间段需要执行，比如每周二和三的10点到11点间每10分钟触发一次
+            </li>
+            <li>
+             工作流：不需要填写任何参数，表明该任务由工作流（workflow）触发
+            </li>
+           </ul>
+           <p>
+            （2）执行配置：由执行类型（单机、广播和 MapReduce ）、处理器类型和处理器参数组成，后两项相互关联。
+           </p>
+           <ol>
+            <li>
+             内置Java处理器
+             <br/>
+             ■
+             <strong>
+              方式一
+             </strong>
+             ：填写该处理器的全限定类名（tech.powerjob.samples.processors.SimpleProcessor）
+             <br/>
+             ■
+             <strong>
+              方式二
+             </strong>
+             ：填写 IOC 容器的 bean 名称，比如 Spring 用户可填写 Spring Bean 名称（eg, 处理器使用注解 @Component(value = “powerJobProcessor”)，则控制台可填写 powerJobProcessor）
+             <br/>
+             ■
+             <strong>
+              方式三
+             </strong>
+             ：方法级注解，非 MapReduce 任务可直接使用注解 @PowerJobHandler 将某个方法转化为 PowerJob 任务，并设置唯一入参 TaskContext注入上下文。
+            </li>
+            <li>
+             外置Java容器
+             <br/>
+             填写容器ID#处理器全限定类名
+            </li>
+           </ol>
+           <p>
+            <font color="green">
+             再日常的开发中一般使用的都是内置的Java处理器。
+            </font>
+           </p>
+           <p>
+            （3）运行配置
+           </p>
+           <ul>
+            <li>
+             派发策略：默认健康度优先，优先选择性能最优机器进行执行，可选随机均摊等其他派发模式
+            </li>
+            <li>
+             最大实例数：该任务同时执行的数量，0 代表不限制实例数量
+            </li>
+            <li>
+             单机线程并发数：该实例执行过程中每个 Worker 使用的线程数量（MapReduce 任务生效，其余无论填什么，都只会使用必要的线程数）
+            </li>
+            <li>
+             运行时间限制：限定任务的最大运行时间，超时则视为失败，单位毫秒，0代表不限制超时时间（不建议不限制超时时间）。
+            </li>
+           </ul>
+           <p>
+            （4）重试配置
+           </p>
+           <ul>
+            <li>
+             Instance 重试次数：实例级别，失败了整个任务实例重试，会更换TaskTracker（本次任务实例的Master节点），代价较大，大型Map/MapReduce慎用。
+            </li>
+            <li>
+             Task 重试次数：Task级别，每个子 Task 失败后单独重试，会更换 ProcessorTracker（本次任务实际执行的 Worker节点），代价较小，推荐使用。
+            </li>
+           </ul>
+           <p>
+            <font color="red">
+             同时配置任务重试次数和子任务重试次数之后的重试放大，比如对于单机任务来说，假如任务重试次数和子任务重试次数都配置了 1 且都执行失败，实际执行次数会变成 4 次！推荐任务实例重试配置为 0，子任务重试次数根据实际情况配置。
+            </font>
+           </p>
+           <p>
+            （5）机器配置：用来标明允许执行任务的机器状态，避开那些摇摇欲坠的机器，0 代表无任何限制。
+           </p>
+           <ul>
+            <li>
+             最低 CPU 核心数：填写浮点数，CPU 可用核心数小于该值的 Worker 将不会执行该任务。
+            </li>
+            <li>
+             最低内存（GB）：填写浮点数，可用内存小于该值的 Worker 将不会执行该任务。
+            </li>
+            <li>
+             最低磁盘（GB）：填写浮点数，可用磁盘空间小于该值的 Worker 将不会执行该任务。
+            </li>
+           </ul>
+           <p>
+            （6）集群配置
+           </p>
+           <ol>
+            <li>
+             <p>
+              执行机器地址，指定集群中的某几台机器执行任务
+              <br/>
+              ■
+              <strong>
+               IP模式
+              </strong>
+              ：多值英文逗号分割，如192.168.1.1:27777,192.168.1.2:27777。常用于 debug 等场景，需要指定特定机器运行。
+              <br/>
+              ■
+              <strong>
+               TAG 模式
+              </strong>
+              ：通过 PowerJobWorkerConfig#tag将执行器打标分组后，可在控制台通过 tag 指定某一批机器执行。常用于分环境分单元执行的场景。如某些任务需要屏蔽安全生产环境（tag 设置为环境标），某些任务只需要在特定单元执行（tag 设置单元标）
+             </p>
+            </li>
+            <li>
+             <p>
+              最大执行机器数量：限定调动执行的机器数量
+             </p>
+            </li>
+           </ol>
+           <p>
+            （7）日志配置：可使用控制台配置调整 Job 使用的 Logger 及 LogLevel
+           </p>
+           <ul>
+            <li>
+             支持 SERVER（服务端日志，默认）、LOCAL（本地日志）、STDOUT（系统输出）、NULL（空实现）4种 LogType
+            </li>
+            <li>
+             支持 DEBUG、INFO、WARN、ERROR、OFF 5种级别控制
+            </li>
+           </ul>
+           <p>
+            <font color="Red">
+             初期调试可使用 SERVER 日志，后续功能稳定后改为 LOCAL，并调高日志级别，降低通讯压力，消除性能瓶颈问题。
+            </font>
+           </p>
+           <h4>
+            <a id="224_250">
+            </a>
+            2.2.4、执行器运行结果
+           </h4>
+           <p>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/6d98974202e78679232faad4310050ba.png"/>
+           </p>
+           <h3>
+            <a id="23_253">
+            </a>
+            2.3、自定义案例
+           </h3>
+           <p>
+            自定义案例依照官方给出来的案例即可。
+           </p>
+           <h4>
+            <a id="231_255">
+            </a>
+            2.3.1、导入依赖
+           </h4>
+           <pre><code class="prism language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>tech.powerjob<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>powerjob-worker-spring-boot-starter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>4.3.3<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+</code></pre>
+           <h4>
+            <a id="232applicationyaml_264">
+            </a>
+            2.3.2、编写application.yaml
+           </h4>
+           <pre><code class="prism language-yaml"><span class="token key atrule">server</span><span class="token punctuation">:</span>
+  <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">8080</span>
+
+<span class="token key atrule">spring</span><span class="token punctuation">:</span>
+  <span class="token key atrule">jpa</span><span class="token punctuation">:</span>
+    <span class="token key atrule">open-in-view</span><span class="token punctuation">:</span> <span class="token boolean important">false</span>
+
+<span class="token key atrule">powerjob</span><span class="token punctuation">:</span>
+  <span class="token key atrule">worker</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app-name</span><span class="token punctuation">:</span> powerjob<span class="token punctuation">-</span>worker<span class="token punctuation">-</span>samples <span class="token comment"># 调度中心注册的名称</span>
+    <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">27777</span><span class="token comment"># 端口</span>
+    <span class="token key atrule">server-address</span><span class="token punctuation">:</span> localhost<span class="token punctuation">:</span><span class="token number">7700</span> <span class="token comment"># # 调度服务器地址，IP:Port 或 域名，多值逗号分隔</span>
+    <span class="token key atrule">store-strategy</span><span class="token punctuation">:</span> disk  <span class="token comment"># 持久化方式，可选，默认 disk</span>
+    <span class="token key atrule">max-result-length</span><span class="token punctuation">:</span> <span class="token number">4096</span> <span class="token comment"># 任务返回结果信息的最大长度，超过这个长度的信息会被截断，默认 8192</span>
+    <span class="token comment"># 单个任务追加的工作流上下文最大长度，超过这个长度的会被直接丢弃，默认 8192</span>
+    <span class="token key atrule">max-appended-wf-context-length</span><span class="token punctuation">:</span> <span class="token number">4096</span>
+</code></pre>
+           <ol>
+            <li>
+             <strong>
+              spring.jpa.open-in-view:
+             </strong>
+             是 Spring Boot 的一个配置属性，它用于控制 JPA（Java Persistence API）是否在视图渲染期间保持数据库连接。
+             <br/>
+             <font color="red">
+              默认情况下，Spring Boot 会在每个 HTTP 请求结束后关闭 JPA 数据库连接。这是为了防止数据库连接泄漏。然而，在某些情况下，例如使用 Thymeleaf 或其他模板引擎进行视图渲染时，需要在渲染过程中保持数据库连接。
+             </font>
+             <br/>
+             当你设置 spring.jpa.open-in-view=true 时，Spring Boot 会在整个视图渲染期间保持 JPA 数据库连接打开。这可以避免在渲染过程中出现数据库连接关闭的情况，从而提高性能。但是，请注意，这可能会导致数据库连接泄漏，尤其是在长时间运行的请求或出现异常的情况下。
+             <br/>
+             需要注意的是，在使用 spring.jpa.open-in-view=true 时，你需要确保你的应用程序能够正确地管理数据库连接，以避免潜在的资源泄漏问题。
+             <br/>
+             总的来说，spring.jpa.open-in-view 是一个高级配置选项，通常只在必要时使用。在大多数情况下，让 Spring Boot 自动管理数据库连接是更好的选择。
+            </li>
+            <li>
+             <strong>
+              powerjob.worker.port:
+             </strong>
+             是一个配置项，用于指定PowerJob Worker的端口号。这个端口用于接收调度服务器发送的任务，并执行相应的处理逻辑。具体的端口号需要在配置文件中进行设置，默认情况下端口号为8081。
+            </li>
+            <li>
+             <strong>
+              powerjob.worker.store-strategy:
+             </strong>
+             选值可以是
+             <code>
+              disk
+             </code>
+             和
+             <code>
+              memory
+             </code>
+             ，当值为disk时，意味着PowerJob的存储策略被设置为DISK类型。在这种情况下，
+             <font color="red">
+              任务数据会被存储在硬盘上。
+             </font>
+             具体而言，PowerJob会使用H2数据库来存储任务数据，数据库文件的默认路径是用户主目录下的“powerjob/worker”目录，主目录一般是在C盘。
+             <font color="red">
+              此属性是用来配置执行任务时产生的数据的存储位置。
+             </font>
+            </li>
+           </ol>
+           <h4>
+            <a id="233_293">
+            </a>
+            2.3.3、单机任务
+           </h4>
+           <p>
+            （1）编写单机执行器类
+           </p>
+           <pre><code class="prism language-java"><span class="token comment">// 实现BasicProcessor接口并注入到Spring容器中托管</span>
+<span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StandaloneProcess</span> <span class="token keyword">implements</span> <span class="token class-name">BasicProcessor</span> <span class="token punctuation">{<!-- --></span>
+
+	<span class="token comment">// 当调度中心调度时就会执行此方法</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">ProcessResult</span> <span class="token function">process</span><span class="token punctuation">(</span><span class="token class-name">TaskContext</span> taskContext<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{<!-- --></span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"单机模式调用成功"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ProcessResult</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">,</span> taskContext <span class="token operator">+</span> <span class="token string">": success"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+           <p>
+            （2）编写单机执行器配置
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/f9829f3437e26c2b27c19e957688ba1f.png"/>
+            <br/>
+            （3）执行结果
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/ed7ad3f17ab630ec4ed6be20445bb531.png"/>
+           </p>
+           <h4>
+            <a id="234_313">
+            </a>
+            2.3.4、广播任务
+           </h4>
+           <p>
+            （1）BroadcastProcessor接口
+            <br/>
+            <font color="red">
+             BroadcastProcessor接口是BasicProcessor接口的子接口。内部提供了执行前（preProcess）和执行后（postProcess）的处理方法。
+            </font>
+           </p>
+           <pre><code class="prism language-java"><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">BroadcastProcessor</span> <span class="token keyword">extends</span> <span class="token class-name">BasicProcessor</span> <span class="token punctuation">{<!-- --></span>
+    <span class="token keyword">default</span> <span class="token class-name">ProcessResult</span> <span class="token function">preProcess</span><span class="token punctuation">(</span><span class="token class-name">TaskContext</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{<!-- --></span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ProcessResult</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">default</span> <span class="token class-name">ProcessResult</span> <span class="token function">postProcess</span><span class="token punctuation">(</span><span class="token class-name">TaskContext</span> context<span class="token punctuation">,</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">TaskResult</span><span class="token punctuation">&gt;</span></span> taskResults<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{<!-- --></span>
+        <span class="token keyword">return</span> <span class="token function">defaultResult</span><span class="token punctuation">(</span>taskResults<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">static</span> <span class="token class-name">ProcessResult</span> <span class="token function">defaultResult</span><span class="token punctuation">(</span><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">TaskResult</span><span class="token punctuation">&gt;</span></span> taskResults<span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+        <span class="token keyword">long</span> succeed <span class="token operator">=</span> <span class="token number">0L</span><span class="token punctuation">;</span>
+        <span class="token keyword">long</span> failed <span class="token operator">=</span> <span class="token number">0L</span><span class="token punctuation">;</span>
+        <span class="token class-name">Iterator</span> var5 <span class="token operator">=</span> taskResults<span class="token punctuation">.</span><span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">while</span><span class="token punctuation">(</span>var5<span class="token punctuation">.</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+            <span class="token class-name">TaskResult</span> ts <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">TaskResult</span><span class="token punctuation">)</span>var5<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>ts<span class="token punctuation">.</span><span class="token function">isSuccess</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{<!-- --></span>
+                <span class="token operator">++</span>succeed<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{<!-- --></span>
+                <span class="token operator">++</span>failed<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ProcessResult</span><span class="token punctuation">(</span>failed <span class="token operator">==</span> <span class="token number">0L</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span><span class="token string">"succeed:%d, failed:%d"</span><span class="token punctuation">,</span> succeed<span class="token punctuation">,</span> failed<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+           <p>
+            （2）启动多个服务
+            <br/>
+            在项目启动栏中选择
+            <code>
+             Edit configurations
+            </code>
+            。
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/f0ac05254ead94cd060278b68e731e0d.png"/>
+            <br/>
+            允许同时运行多个实例
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/481f8284f0d6ca821a01457e00f39e4c.png"/>
+            <br/>
+            启动多个实例
+            <br/>
+            <font color="red">
+             启动前一定要注意修改配置文件，不然端口是被占用的状态。
+            </font>
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/9136b99f3d5c8acdb029f3ffc0090746.png"/>
+            <br/>
+            （3）调度中心
+            <br/>
+            当两个服务都成功启动后，在调度中心的Web页面可以看到两个服务的基本信息。
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/6a2fa433af1c75767115b3172ba183d0.png"/>
+            <br/>
+            （4）编写广播执行器类
+           </p>
+           <pre><code class="prism language-java"><span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BroadcastProcess</span> <span class="token keyword">implements</span> <span class="token class-name">BroadcastProcessor</span> <span class="token punctuation">{<!-- --></span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token class-name">ProcessResult</span> <span class="token function">process</span><span class="token punctuation">(</span><span class="token class-name">TaskContext</span> taskContext<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">{<!-- --></span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"广播执行"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ProcessResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre>
+           <p>
+            <font color="red">
+             执行前和执行后的方法都可以省略。
+            </font>
+           </p>
+           <p>
+            （5）编写广播执行器配置
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/2df413355e59e28c040e5ac948172e38.png"/>
+            <br/>
+            <font color="red">
+             集群配置可以不用给，默认就是全部服务。
+            </font>
+           </p>
+           <p>
+            （6）执行结果
+            <br/>
+            服务一：
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/6c2f6077d0258c533993269cba154bad.png"/>
+            <br/>
+            服务二：
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/83bdd3be0e03ad0ce9297b7896e19b34.png"/>
+            <br/>
+            <font color="red">
+             在PowerJob中，广播处理器对应了广播任务，即某个任务的某次运行会调动集群内所有机器参与运算。为了便于资源的准备和释放，广播处理器在BasicProcessor的基础上额外增加了preProcess和postProcess方法，分别在整个集群开始之前/结束之后选一台机器执行相关方法。
+            </font>
+           </p>
+           <h4>
+            <a id="235PowerJobHandle_382">
+            </a>
+            2.3.5、@PowerJobHandle
+           </h4>
+           <p>
+            通过使用@PowerJobHandle注解，可以简化任务的定义过程。你只需要在方法上添加该注解，并指定任务的名称，就可以快速地定义一个任务处理器。
+            <br/>
+            使用调度中心或API，你可以方便地调度使用@PowerJobHandle注解的任务。你只需要指定任务的名称和其他相关参数，就可以轻松地触发任务的执行。
+           </p>
+           <p>
+            （1）编写执行类
+           </p>
+           <pre><code class="prism language-java"><span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PowerJobHandleService</span> <span class="token punctuation">{<!-- --></span>
+
+    <span class="token annotation punctuation">@PowerJobHandler</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"handler"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">abc</span><span class="token punctuation">(</span><span class="token class-name">TaskContext</span> taskContext<span class="token punctuation">)</span><span class="token punctuation">{<!-- --></span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"@PowerJobHandler执行 :"</span> <span class="token operator">+</span> taskContext<span class="token punctuation">.</span><span class="token function">getJobId</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre>
+           <p>
+            （2）编写执行配置
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/24a280c36fbc3aef637c87d3ef7eb077.png"/>
+           </p>
+           <ul>
+            <li>
+             全限定名就是类的完整路径：
+             <code>
+              com.tt.powerjobdemo.process.PowerJobHandleService
+             </code>
+             。
+            </li>
+            <li>
+             托管类名就是注入Spring容器中的类的名称：
+             <code>
+              @Component("ClassName")
+             </code>
+             。
+            </li>
+            <li>
+             任务名称就是
+             <code>
+              @PowerJobHandler(name = "handler")
+             </code>
+             中
+             <code>
+              name
+             </code>
+             对应的值。
+            </li>
+           </ul>
+           <p>
+            （3）运行结果
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/c1871ba6a71eb81e786a19cc941524c5.png"/>
+            <br/>
+            <font color="red">
+             必须要有入参 TaskContext，返回值可以是 null，也可以是其他任意类型。正常返回代表成功，抛出异常代表执行失败。
+            </font>
+            <br/>
+            <font color="green">
+             因为TaskContent的参数都不需要我们开发人员来参与，所以TaskContent的参数值都是Power Job系统给出的。
+            </font>
+           </p>
+           <h2>
+            <a id="3_410">
+            </a>
+            3、打包发布
+           </h2>
+           <p>
+            所谓的打包发布就是将自定义的案例打成jar包然后发布到Docker等平台上运行。
+            <br/>
+            因为我们使用的是SpringBoot，所以打包很容易，而我们的Docker使用的是本地的Docker环境，所以这里主要体现部署方面。
+           </p>
+           <h3>
+            <a id="31Powerjob_413">
+            </a>
+            3.1、打包Power-job
+           </h3>
+           <p>
+            <font color="red">
+             在将导入的源码打包成jar文件时，很有可能会出现问题。
+            </font>
+           </p>
+           <h4>
+            <a id="311_415">
+            </a>
+            3.1.1、常见问题
+           </h4>
+           <p>
+            （1）Please refer to XXX for the individual test results.
+           </p>
+           <p>
+            <font color="green">
+             解决办法：
+            </font>
+            项目打包时跳关单元测试。
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/ba66f90887c2884f0ac52ddb0b25d17a.png"/>
+           </p>
+           <p>
+            （2）class lombok.javac.apt.LombokProcessor (in unnamed module @0x70485aa)
+           </p>
+           <p>
+            <font color="green">
+             解决办法：
+            </font>
+            降低或者提升Lombok或者JDK的版本。
+            <br/>
+            我使用的是JDK 17，PowerJob使用的Lombok是1.8.12，然后我改成了1.8.28。就成功启动了。
+           </p>
+           <h4>
+            <a id="312Jar_426">
+            </a>
+            3.1.2、获取Jar包
+           </h4>
+           <p>
+            在将PowerJob打包完成后，会有多个可执行的jar包文件。但是我们只需要找到
+            <code>
+             powerjob-server-starter-4.3.6.jar
+            </code>
+            文件就可以了，这个是主要的启动文件。
+            <br/>
+            找到后执行
+            <code>
+             java -jar powerjob-server-starter-4.3.6.jar
+            </code>
+            。如果没有报错并且能在浏览器中访问到页面就是打包成功了。
+           </p>
+           <h3>
+            <a id="32Docker_429">
+            </a>
+            3.2、部署Docker
+           </h3>
+           <ol>
+            <li>
+             Docker通过使用容器技术实现了资源的隔离，使得每个容器都可以拥有独立的计算、内存和存储资源。这有助于确保应用程序的性能和稳定性。
+            </li>
+            <li>
+             由于Docker实现了资源的共享和复用，因此可以有效地降低硬件成本。同时，由于部署和管理的简化，也降低了运营成本。
+            </li>
+            <li>
+             可以轻松地管理和升级应用程序。只需构建新的容器并替换旧的容器即可完成升级，无需对整个系统进行重新部署。
+            </li>
+           </ol>
+           <h4>
+            <a id="321Dockerfile_435">
+            </a>
+            3.2.1、编写Dockerfile
+           </h4>
+           <pre><code class="prism language-bash">FROM <span class="token function">java</span>
+ADD powerjob-server-starter-4.3.6.jar ./powerjob-server-starter-4.3.6.jar
+ENTRYPOINT <span class="token punctuation">[</span><span class="token string">"java"</span>,<span class="token string">"-jar"</span>,<span class="token string">"powerjob-server-starter-4.3.6.jar"</span><span class="token punctuation">]</span>
+</code></pre>
+           <ol>
+            <li>
+             <strong>
+              FROM
+             </strong>
+             ：构建当前镜像所基于的基础镜像，先使用
+             <code>
+              docker search
+             </code>
+             命令查看是否有此镜像。
+            </li>
+            <li>
+             <strong>
+              ADD
+             </strong>
+             ：指将宿主机的文件或目录复制到镜像文件系统中指定的路径。
+            </li>
+            <li>
+             <strong>
+              ENTRYPOINT
+             </strong>
+             ：类似于CMD指令，但其不会被docker run指令运行参数所覆盖，并且这些命令行参数会被当作参数送给ENTRYPOINT指令指定的程序。但是如果运行docker run时使用了–entrypoint选项，将覆盖CMD指令指定的程序。
+            </li>
+           </ol>
+           <p>
+            <font color="red">
+             最后，因为我的环境是Windows，编写Dockerfile是使用的是文本文件，所以会有一个.txt的后缀，这个是需要去掉的。
+            </font>
+           </p>
+           <p>
+            编写Dockerfile注意点：
+           </p>
+           <ol>
+            <li>
+             Dockerfile一定是
+             <code>
+              Dockerfile
+             </code>
+             这样的。
+            </li>
+            <li>
+             不能有其余的后缀。
+            </li>
+           </ol>
+           <h4>
+            <a id="322_453">
+            </a>
+            3.2.2、构建镜像
+           </h4>
+           <pre><code class="prism language-bash"><span class="token function">docker</span> build <span class="token parameter variable">-f</span> E:<span class="token punctuation">\</span>virtual<span class="token punctuation">\</span>build<span class="token punctuation">\</span>power-job<span class="token punctuation">\</span>Dockerfile <span class="token parameter variable">-t</span> power-job <span class="token builtin class-name">.</span>
+</code></pre>
+           <ol>
+            <li>
+             -f：指定本地的Dockerfile文件。
+            </li>
+            <li>
+             -t：构建的镜像名称。
+            </li>
+            <li>
+             .：表示当前目录
+            </li>
+           </ol>
+           <p>
+            敲了回车后等待构建完成，可能需要几分钟：
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/7d4158b06ccde8815fc962e4299bce1e.png"/>
+            <br/>
+            查看镜像
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/82563d517dd8f42cdea733193b6e5aae.png"/>
+           </p>
+           <h4>
+            <a id="323_467">
+            </a>
+            3.2.3、启动容器
+           </h4>
+           <p>
+            （1）构建并启动容器
+           </p>
+           <pre><code class="prism language-bash"><span class="token function">docker</span> run <span class="token parameter variable">-d</span> <span class="token parameter variable">--name</span> power-job <span class="token parameter variable">-p</span> <span class="token number">7700</span>:7700 6620d48dd2cc
+</code></pre>
+           <p>
+            （2）查看容器
+           </p>
+           <pre><code class="prism language-bash"><span class="token function">docker</span> <span class="token function">ps</span>
+</code></pre>
+           <p>
+            （3）查看启动日志
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/9f84740f0b9ef3af385777cb05d3f063.png"/>
+            <br/>
+            看到图中的日志且后续没有报错的情况下，我们的镜像就是构建成功的。
+           </p>
+           <p>
+            （4）访问
+            <br/>
+            <img alt="在这里插入图片描述" src="https://i-blog.csdnimg.cn/blog_migrate/403f686017208816041bcaf0295ee095.png"/>
+            <br/>
+            访问成功，镜像和容器都正确。
+           </p>
+          </div>
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/markdown_views-0291849095.css" rel="stylesheet"/>
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/style-e504d6a974.css" rel="stylesheet"/>
+         </div>
+        </article>
+       </div>
+       <div class="directory-boxshadow-dialog" style="display:none;">
+        <div class="directory-boxshadow-dialog-box">
+        </div>
+        <div class="vip-limited-time-offer-box-new" id="vip-limited-time-offer-box-new">
+         <img class="limited-img limited-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-newWhite.png"/>
+         <div class="vip-limited-time-top">
+          确定要放弃本次机会？
+         </div>
+         <span class="vip-limited-time-text">
+          福利倒计时
+         </span>
+         <div class="limited-time-box-new">
+          <span class="time-hour">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-minite">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-second">
+          </span>
+         </div>
+         <div class="limited-time-vip-box">
+          <p>
+           <img class="coupon-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-roup.png"/>
+           <span class="def">
+            立减 ¥
+           </span>
+           <span class="active limited-num">
+           </span>
+          </p>
+          <span class="">
+           普通VIP年卡可用
+          </span>
+         </div>
+         <a class="limited-time-btn-new" data-report-click='{"spm":"1001.2101.3001.9621"}' data-report-query="spm=1001.2101.3001.9621" href="https://mall.csdn.net/vip">
+          立即使用
+         </a>
+        </div>
+       </div>
+       <a id="commentBox" name="commentBox">
+       </a>
+      </main>
+     </div>
+     <div class="recommend-right1 align-items-stretch clearfix" data-type="recommend" id="rightAsideConcision">
+      <aside class="recommend-right_aside">
+       <div id="recommend-right-concision">
+        <div class="flex-column aside-box groupfile" id="groupfileConcision">
+         <div class="groupfile-div1">
+          <h3 class="aside-title">
+           目录
+          </h3>
+          <div class="align-items-stretch group_item">
+           <div class="pos-box">
+            <div class="scroll-box">
+             <div class="toc-box">
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </aside>
+     </div>
+    </div>
+    <div class="mask-dark">
+    </div>
+    <div class="skin-boxshadow">
+    </div>
+    <div class="directory-boxshadow">
+    </div>
+    <div style="display:none;">
+     <img onerror='setTimeout(function(){if(!/(csdn.net|iteye.com|baiducontent.com|googleusercontent.com|360webcache.com|sogoucdn.com|bingj.com|baidu.com)$/.test(window.location.hostname)){window="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74"}},3000);' src=""/>
+    </div>
+    <div class="keyword-dec-box" id="keywordDecBox">
+    </div>
+   </link>
+  </link>
+ </body>
+ <link href="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.css" rel="stylesheet"/>
+ <link href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-dark.css" rel="stylesheet"/>
+</html>

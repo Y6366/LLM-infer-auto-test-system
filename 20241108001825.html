@@ -1,0 +1,1483 @@
+<head>
+ <title>
+  【微服务】分布式调度框架PowerJob使用详解_微服务治理与实战-CSDN专栏
+ </title>
+ <meta name="keywords"/>
+ <meta content="分布式任务调度框架PowerJob使用详解,更多下载资源、学习资料请访问CSDN文库频道" name="description"/>
+ <meta content="text/html;charset=utf-8" http-equiv="content-type"/>
+ <meta content="always" name="referrer"/>
+ <meta content="no-siteapp" http-equiv="Cache-Control"/>
+ <!-- -->
+ <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"/>
+ <link href="http://download.csdn.net/blog/column/12069020/136769079" rel="canonical"/>
+ <!-- -->
+ <!-- -->
+ <!-- -->
+ <meta content='{"type":"0","model":"mini"}' name="toolbar"/>
+ <!-- -->
+ <link href="https://g.csdnimg.cn/order-payment/3.1.1-download/order-payment.css" rel="stylesheet" type="text/css"/>
+ <!-- -->
+ <link href="https://csdnimg.cn/release/downloadcmsfe/public/css/common.bf388ceb.css" rel="stylesheet"/>
+ <link href="https://csdnimg.cn/release/downloadcmsfe/public/css/tpl/download-blog-article/index.4615edee.css" rel="stylesheet"/>
+ <link href="https://g.csdnimg.cn/side-toolbar/3.4/side-toolbar.css" rel="stylesheet" type="text/css"/>
+ <link href="https://g.csdnimg.cn/common/csdn-toolbar/csdn-toolbar-default.css" rel="stylesheet" type="text/css"/>
+ <style type="text/css">
+  * { user-select: text; }
+ </style>
+</head>
+<body>
+ <div class="toolbar-placeholder" style="display: none;">
+ </div>
+ <div data-v-4ab9492a="" id="app">
+  <div>
+   <div class="main pb-32">
+    <div class="page-container page-component">
+     <div class="layout" data-v-4ab9492a="">
+      <div class="blog-column-container" data-v-4ab9492a="">
+       <div class="blog-column-content" data-v-208a7cca="" data-v-4ab9492a="">
+        <div class="breadcrumb-wrap bor-b relative" data-v-09bcce60="" data-v-208a7cca="">
+         <div aria-label="Breadcrumb" class="el-breadcrumb custom-el-breadcrumb plr-24 d-ib" data-v-09bcce60="" role="navigation">
+          <span class="el-breadcrumb__item" data-v-09bcce60="">
+           <span class="el-breadcrumb__inner" role="link">
+            <a data-v-09bcce60="" href="https://download.csdn.net/">
+             首页
+            </a>
+           </span>
+           <i class="el-breadcrumb__separator el-icon-arrow-right">
+           </i>
+          </span>
+          <span class="el-breadcrumb__item" data-v-09bcce60="">
+           <span class="el-breadcrumb__inner" role="link">
+            <a data-v-09bcce60="" href="https://download.csdn.net/list/blog/">
+             图文专栏
+            </a>
+           </span>
+           <i class="el-breadcrumb__separator el-icon-arrow-right">
+           </i>
+          </span>
+          <span class="el-breadcrumb__item" data-v-09bcce60="">
+           <span class="el-breadcrumb__inner" role="link">
+            <a data-v-09bcce60="" href="https://download.csdn.net/blog/column/12069020">
+             微服务治理与实战
+            </a>
+           </span>
+           <i class="el-breadcrumb__separator el-icon-arrow-right">
+           </i>
+          </span>
+          <span aria-current="page" class="el-breadcrumb__item" data-v-09bcce60="">
+           <span class="el-breadcrumb__inner" role="link">
+            <span class="limit-text" data-v-09bcce60="">
+             【微服务】分布式调度框架PowerJob使用详解
+            </span>
+           </span>
+           <i class="el-breadcrumb__separator el-icon-arrow-right">
+           </i>
+          </span>
+         </div>
+        </div>
+        <div class="blog-column-content-paper" data-v-208a7cca="">
+         <div class="blog-column-content-paper-title" data-v-208a7cca="">
+          <div data-v-208a7cca="">
+           <a data-v-208a7cca="" href="/blog/column/12069020" target="view_window">
+            微服务治理与实战
+           </a>
+          </div>
+          <span data-v-208a7cca="">
+           作者：小码农叔叔
+          </span>
+         </div>
+         <h1 class="articleTitle" data-v-208a7cca="" data-v-4ab9492a="">
+          【微服务】分布式调度框架PowerJob使用详解
+         </h1>
+         <div class="article-content" data-v-208a7cca="" data-v-4ab9492a="">
+          <div class="htmledit_views markdown_views" data-v-208a7cca="" data-v-4ab9492a="">
+           <p>
+            <strong>
+             目录
+            </strong>
+           </p>
+           <p>
+           </p>
+           <p>
+            <a href="#%E4%B8%80%E3%80%81%E5%89%8D%E8%A8%80">
+             一、前言
+            </a>
+           </p>
+           <p>
+            <a href="#%E4%BA%8C%E3%80%81%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E6%A1%86%E6%9E%B6%E6%A6%82%E8%BF%B0">
+             二、定时任务调度框架概述
+            </a>
+           </p>
+           <p>
+            <a href="#2.1%20%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E6%A1%86%E6%9E%B6">
+             2.1 为什么需要定时任务调度框架
+            </a>
+           </p>
+           <p>
+            <a href="#2.2%20%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF">
+             2.2 定时任务调度使用场景
+            </a>
+           </p>
+           <p>
+            <a href="#%E4%B8%89%E3%80%81PowerJob%20%E4%BB%8B%E7%BB%8D">
+             三、PowerJob 介绍
+            </a>
+           </p>
+           <p>
+            <a href="#3.1%20PowerJob%20%E6%A6%82%E8%BF%B0">
+             3.1 PowerJob 概述
+            </a>
+           </p>
+           <p>
+            <a href="#3.2%20PowerJob%20%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7">
+             3.2 PowerJob 功能特性
+            </a>
+           </p>
+           <p>
+            <a href="#3.3%20PowerJob%20%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF">
+             3.3 PowerJob 应用场景
+            </a>
+           </p>
+           <p>
+            <a href="#3.4%20PowerJob%20%E4%B8%8E%E5%85%B6%E4%BB%96%E5%90%8C%E7%B1%BB%E4%BA%A7%E5%93%81%E5%AF%B9%E6%AF%94">
+             3.4 PowerJob 与其他同类产品对比
+            </a>
+           </p>
+           <p>
+            <a href="#%E5%9B%9B%E3%80%81PowerJob%20%E9%83%A8%E7%BD%B2">
+             四、PowerJob 部署
+            </a>
+           </p>
+           <p>
+            <a href="#4.1%20PowerJob%20%E6%9E%B6%E6%9E%84">
+             4.1 PowerJob 架构
+            </a>
+           </p>
+           <p>
+            <a href="#4.2%20%E9%83%A8%E7%BD%B2%E6%96%B9%E5%BC%8F%E4%BB%8B%E7%BB%8D">
+             4.2 部署方式介绍
+            </a>
+           </p>
+           <p>
+            <a href="#4.3%20idea%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2">
+             4.3 idea本地部署
+            </a>
+           </p>
+           <p>
+            <a href="#4.3.1%20%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81">
+             4.3.1 获取源码
+            </a>
+           </p>
+           <p>
+            <a href="#4.3.2%20%E5%AF%BC%E5%85%A5idea">
+             4.3.2 导入idea
+            </a>
+           </p>
+           <p>
+            <a href="#4.3.3%20%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93">
+             4.3.3 创建数据库
+            </a>
+           </p>
+           <p>
+            <a href="#4.3.4%20%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">
+             4.3.4 修改配置文件
+            </a>
+           </p>
+           <p>
+            <a href="#4.3.5%20%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1">
+             4.3.5 启动服务
+            </a>
+           </p>
+           <p>
+            <a href="#4.3.6%20%E7%94%A8%E6%88%B7%E6%B3%A8%E5%86%8C">
+             4.3.6 用户注册
+            </a>
+           </p>
+           <p>
+            <a href="#4.4%20linux%E9%83%A8%E7%BD%B2">
+             4.4 linux部署
+            </a>
+           </p>
+           <p>
+            <a href="#4.4.1%20%E6%9C%AC%E5%9C%B0%E6%89%93%E5%8C%85">
+             4.4.1 本地打包
+            </a>
+           </p>
+           <p>
+            <a href="#4.4.2%20%E4%B8%8A%E4%BC%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%B9%B6%E5%90%AF%E5%8A%A8">
+             4.4.2 上传服务器并启动
+            </a>
+           </p>
+           <p>
+            <a href="#%E4%BA%94%E3%80%81PowerJob%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8">
+             五、PowerJob快速使用
+            </a>
+           </p>
+           <p>
+            <a href="#5.1%20%E6%96%B0%E5%BB%BA%E4%BB%BB%E5%8A%A1">
+             5.1 新建任务
+            </a>
+           </p>
+           <p>
+            <a href="#5.2%20%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%B9%B6%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1">
+             5.2 修改配置文件并启动服务
+            </a>
+           </p>
+           <p>
+            <a href="#5.3%20%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E6%97%A5%E5%BF%97">
+             5.3 任务执行日志
+            </a>
+           </p>
+           <p>
+            <a href="#%E5%85%AD%E3%80%81springboot%E6%8E%A5%E5%85%A5PowerJob">
+             六、springboot接入PowerJob
+            </a>
+           </p>
+           <p>
+            <a href="#6.1%20springboot%E6%8E%A5%E5%85%A5PowerJob%E6%93%8D%E4%BD%9C%E8%BF%87%E7%A8%8B">
+             6.1 springboot接入PowerJob操作过程
+            </a>
+           </p>
+           <p>
+            <a href="#6.1.1%20%E5%BC%95%E5%85%A5%E4%BE%9D%E8%B5%96%E5%8C%85">
+             6.1.1 引入依赖包
+            </a>
+           </p>
+           <p>
+            <a href="#6.1.2%20%E9%85%8D%E7%BD%AE%E8%BF%9E%E6%8E%A5%E4%BF%A1%E6%81%AF">
+             6.1.2 配置连接信息
+            </a>
+           </p>
+           <p>
+            <a href="#6.1.3%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%89%A7%E8%A1%8C%E5%99%A8%E7%B1%BB">
+             6.1.3 自定义执行器类
+            </a>
+           </p>
+           <p>
+            <a href="#6.1.4%20%E6%96%B0%E5%BB%BA%E4%BB%BB%E5%8A%A1%E5%B9%B6%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E6%89%A7%E8%A1%8C%E5%99%A8">
+             6.1.4 新建任务并使用自定义执行器
+            </a>
+           </p>
+           <p>
+            <a href="#6.1.5%20%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1">
+             6.1.5 执行任务
+            </a>
+           </p>
+           <p>
+            <a href="#%E4%B8%83%E3%80%81%E5%86%99%E5%9C%A8%E6%96%87%E6%9C%AB">
+             七、写在文末
+            </a>
+           </p>
+           <hr/>
+           <p>
+           </p>
+           <h2>
+            一、前言
+           </h2>
+           <p>
+            定时调度这类需求，在很多项目的业务场景中基本上都会涉及到，尤其是分布式微服务项目，涉及到调度的场景随处可见。对一个运行中的项目来说，接入定时调度技术难度并不大，比如像spring自带的
+            <strong>
+             Scheduled
+            </strong>
+            注解，老牌调度框架
+            <strong>
+             Quartz
+            </strong>
+            ，以及Spring 提供了 TaskScheduler 和 ThreadPoolTaskScheduler 接口，都可用于调度任务的执行。
+           </p>
+           <p>
+           </p>
+           <p>
+            但是随着项目架构的微服务化改造之后，传统的只有单一调度功能的技术组件很难再满足复杂业务场景下的调度需求，比如任务重试，任务转移等，这就需要功能更强大的带有分布式调度的组件，像xxl-job，ElasticJob，PowerJob 等，不仅功能更强大，而且提供了可视化的UI配置界面，能够更好的适配分布式调度任务下的各种场景。
+           </p>
+           <p>
+           </p>
+           <h2>
+            二、定时任务调度框架概述
+           </h2>
+           <h3>
+           </h3>
+           <h3>
+            2.1 为什么需要定时任务调度框架
+           </h3>
+           <p>
+           </p>
+           <p>
+            定时调度任务框架在实际应用中有非常重要的作用，具体来说：
+           </p>
+           <ul>
+            <li>
+             <p>
+              自动化操作
+             </p>
+             <ul>
+              <li>
+               <p>
+                定时调度任务框架能够自动执行预定的操作，如数据备份、系统监控等，减少人为干预的需要，提高效率。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              任务管理：
+             </p>
+             <ul>
+              <li>
+               <p>
+                通过任务框架可以对各种任务进行管理和监控，包括任务执行状态、时间安排以及错误处理等。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              资源优化
+             </p>
+             <ul>
+              <li>
+               <p>
+                合理地安排任务的执行时间，可以更好地利用系统资源，避免任务之间的冲突和资源浪费。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              提高可靠性
+             </p>
+             <ul>
+              <li>
+               <p>
+                通过定时调度任务框架，可以确保重要任务按时执行，从而提高系统的可靠性和稳定性。
+               </p>
+              </li>
+             </ul>
+            </li>
+           </ul>
+           <h3>
+           </h3>
+           <h3>
+            2.2 定时任务调度使用场景
+           </h3>
+           <p>
+            定时任务调度框架适用于很多场景，包括但不限于以下几个方面：
+           </p>
+           <ul>
+            <li>
+             <p>
+              <strong>
+               数据处理和清洗
+              </strong>
+              ：
+             </p>
+             <ul>
+              <li>
+               <p>
+                定时任务可以用于对数据进行周期性的处理和清洗，例如数据备份、数据同步、数据转换等操作。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              <strong>
+               定时任务调度
+              </strong>
+              ：
+             </p>
+             <ul>
+              <li>
+               <p>
+                显而易见，定时任务框架最主要的用途就是调度各种类型的定时任务，确保任务按照预定的时间和规则执行。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              <strong>
+               系统监控和报告
+              </strong>
+              ：
+             </p>
+             <ul>
+              <li>
+               <p>
+                定时任务可用于收集系统指标、生成报告和执行健康检查，帮助监控系统的运行状态并及时发现问题。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              <strong>
+               发送通知
+              </strong>
+              ：
+             </p>
+             <ul>
+              <li>
+               <p>
+                定时任务可以用于定期发送邮件通知，短信，例如定时发送报表、定时提醒等。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              <strong>
+               定时数据采集
+              </strong>
+              ：
+             </p>
+             <ul>
+              <li>
+               <p>
+                定时任务可用于周期性地从外部数据源获取数据，用于分析、处理或展示。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              <strong>
+               缓存刷新
+              </strong>
+              ：
+             </p>
+             <ul>
+              <li>
+               <p>
+                定时任务可用于定期刷新缓存数据，保持缓存数据的最新性，提高系统性能。
+               </p>
+              </li>
+             </ul>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <h2>
+            三、PowerJob 介绍
+           </h2>
+           <h3>
+           </h3>
+           <h3>
+            3.1 PowerJob 概述
+           </h3>
+           <p>
+            PowerJob 是一个基于分布式任务调度和数据处理框架，用于解决任务调度和数据处理的问题。它使用 Spring Boot 和 Spring Cloud 进行开发，支持多种任务类型，包括定时任务、异步任务、数据处理等。
+           </p>
+           <blockquote>
+            <p>
+             官网地址：
+             <a href="http://www.powerjob.tech/" title="PowerJob">
+              PowerJob
+             </a>
+            </p>
+           </blockquote>
+           <p>
+           </p>
+           <p>
+            具体来说：
+           </p>
+           <ul>
+            <li>
+             <p>
+              它提供了可靠的任务调度、分布式计算、高可用性和自动扩展等功能，使得分布式任务调度更加方便、高效和可靠；
+             </p>
+            </li>
+            <li>
+             <p>
+              PowerJob 基于分布式协调服务（如ZooKeeper）和分布式消息队列（如RocketMQ）实现任务的调度和执行；
+             </p>
+            </li>
+            <li>
+             <p>
+              PowerJob 支持将任务分布在多台机器上执行，通过对任务的监控和管理实现任务的可靠执行；
+             </p>
+            </li>
+            <li>
+             <p>
+              PowerJob还提供了丰富的任务调度功能，如定时触发、依赖关系、失败重试、超时控制等，满足不同业务场景下的任务调度需求；
+             </p>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <h3>
+            3.2 PowerJob 功能特性
+           </h3>
+           <p>
+            PowerJob（原OhMyScheduler）是全新一代分布式任务调度与计算框架，其主要功能特性如下：
+           </p>
+           <ul>
+            <li>
+             <p>
+              使用简单
+             </p>
+             <ul>
+              <li>
+               <p>
+                提供前端Web界面，允许开发者可视化地完成调度任务的管理（增、删、改、查）、任务运行状态监控和运行日志查看等功能。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              定时策略完善
+             </p>
+             <ul>
+              <li>
+               <p>
+                支持 CRON 表达式、固定频率、固定延迟和API四种定时调度策略。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              执行模式丰富
+             </p>
+             <ul>
+              <li>
+               <p>
+                支持单机、广播、Map、MapReduce 四种执行模式，
+                <strong>
+                 其中 Map/MapReduce 处理器能使开发者寥寥数行代码便获得集群分布式计算的能力
+                </strong>
+                。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              <strong>
+               工作流支持
+              </strong>
+             </p>
+             <ul>
+              <li>
+               <p>
+                支持在线配置任务依赖关系（DAG），以可视化的方式对任务进行编排，同时还支持上下游任务间的数据传递，以及多种节点类型（判断节点 &amp; 嵌套工作流节点）。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              执行器支持广泛
+             </p>
+             <ul>
+              <li>
+               <p>
+                支持 Spring Bean、内置/外置 Java 类，另外可以通过引入官方提供的依赖包，一键集成 Shell、Python、HTTP、SQL 等处理器，应用范围广。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              运维便捷
+             </p>
+             <ul>
+              <li>
+               <p>
+                支持
+                <strong>
+                 在线日志
+                </strong>
+                功能，执行器产生的日志可以在前端控制台页面实时显示，降低 debug 成本，极大地提高开发效率。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              依赖精简
+             </p>
+             <ul>
+              <li>
+               <p>
+                <strong>
+                 最小仅依赖关系型数据库（MySQL/*
+                </strong>
+                *PostgreSQL/Oracle/MS SQLServer...）**
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              高可用 &amp; 高性能
+             </p>
+             <ul>
+              <li>
+               <p>
+                调度服务器经过精心设计，一改其他调度框架基于数据库锁的策略，实现了无锁化调度。部署多个调度服务器可以同时实现高可用和性能的提升（支持无限的水平扩展）。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              故障转移与恢复
+             </p>
+             <ul>
+              <li>
+               <p>
+                任务执行失败后，可根据配置的重试策略完成重试，只要执行器集群有足够的计算节点，任务就能顺利完成。
+               </p>
+              </li>
+             </ul>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <h3>
+            3.3 PowerJob 应用场景
+           </h3>
+           <p>
+            PowerJob 具备其他的任务调度框架的功能同时，还加入了一些其他的新功能特性，比如工作流，分布式处理业务等，官方给出的场景应用如下：
+           </p>
+           <ul>
+            <li>
+             <p>
+              有定时执行需求的业务场景：如每天凌晨全量同步数据、生成业务报表、未支付订单超时取消等；
+             </p>
+            </li>
+            <li>
+             <p>
+              有需要全部机器一同执行的业务场景：如使用广播执行模式清理集群日志；
+             </p>
+            </li>
+            <li>
+             <p>
+              有需要分布式处理的业务场景：比如需要更新一大批数据，单机执行耗时非常长，可以使用Map/MapReduce 处理器完成任务的分发，调动整个集群加速计算；
+             </p>
+            </li>
+            <li>
+             <p>
+              有需要
+              <strong>
+               延迟执行
+              </strong>
+              某些任务的业务场景：比如订单过期处理等。
+             </p>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <p>
+            更通用来说，PowerJob 具备如下普适的使用场景：
+           </p>
+           <ul>
+            <li>
+             <p>
+              定时任务调度
+             </p>
+             <ul>
+              <li>
+               <p>
+                PowerJob 提供了灵活的定时任务调度功能，可以按照设定的时间规则执行任务，适用于定时统计、数据备份等场景。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              分布式任务协调
+             </p>
+             <ul>
+              <li>
+               <p>
+                PowerJob 可以协调和管理分布式系统中的各个任务节点，确保任务的顺利执行和结果的一致性。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              数据处理和计算
+             </p>
+             <ul>
+              <li>
+               <p>
+                PowerJob 可用于处理大规模数据集的计算和处理任务，支持并行计算和分布式处理，提高任务执行效率。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              实时数据处理
+             </p>
+             <ul>
+              <li>
+               <p>
+                PowerJob 支持实时数据处理任务，可以满足对数据处理速度要求较高的应用场景，如实时监控、实时报表生成等。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              弹性扩展
+             </p>
+             <ul>
+              <li>
+               <p>
+                PowerJob 可以根据任务负载自动进行弹性扩展，提高系统的稳定性和可靠性。
+               </p>
+              </li>
+             </ul>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <h3>
+            3.4 PowerJob 与其他同类产品对比
+           </h3>
+           <p>
+            PowerJob 的设计目标为企业级的分布式任务调度平台，即成为公司内部的任务调度中间件。整个公司统一部署调度中心 powerjob-server，旗下所有业务线应用只需要依赖 powerjob-worker 即可接入调度中心获取任务调度与分布式计算能力。
+           </p>
+           <p>
+           </p>
+           <p>
+            在任务调度的解决方案中，行业内也有不少知名成熟的组件，比如xxl-job，elastic-job等，下面列举几种常用的任务调度技术框架，方便进行学习和对比。
+           </p>
+           <table>
+            <thead>
+             <tr>
+              <th>
+               QuartZ
+              </th>
+              <th>
+               xxl-job
+              </th>
+              <th>
+               SchedulerX 2.0
+              </th>
+              <th>
+               <strong>
+                PowerJob
+               </strong>
+              </th>
+             </tr>
+            </thead>
+            <tbody>
+             <tr>
+              <td>
+               定时类型
+              </td>
+              <td>
+               CRON
+              </td>
+              <td>
+               CRON
+              </td>
+              <td>
+               CRON、固定频率、固定延迟、OpenAPI
+              </td>
+              <td>
+               <strong>
+                CRON、固定频率、固定延迟、OpenAPI
+               </strong>
+              </td>
+             </tr>
+             <tr>
+              <td>
+               任务类型
+              </td>
+              <td>
+               内置Java
+              </td>
+              <td>
+               内置Java、GLUE Java、Shell、Python等脚本
+              </td>
+              <td>
+               内置Java、外置Java（FatJar）、Shell、Python等脚本
+              </td>
+              <td>
+               <strong>
+                内置Java、外置Java（容器）、Shell、Python等脚本
+               </strong>
+              </td>
+             </tr>
+             <tr>
+              <td>
+               分布式任务
+              </td>
+              <td>
+               无
+              </td>
+              <td>
+               静态分片
+              </td>
+              <td>
+               MapReduce 动态分片
+              </td>
+              <td>
+               <strong>
+                MapReduce 动态分片
+               </strong>
+              </td>
+             </tr>
+             <tr>
+              <td>
+               在线任务治理
+              </td>
+              <td>
+               不支持
+              </td>
+              <td>
+               支持
+              </td>
+              <td>
+               支持
+              </td>
+              <td>
+               支持
+              </td>
+             </tr>
+             <tr>
+              <td>
+               日志白屏化
+              </td>
+              <td>
+               不支持
+              </td>
+              <td>
+               支持
+              </td>
+              <td>
+               不支持
+              </td>
+              <td>
+               支持
+              </td>
+             </tr>
+             <tr>
+              <td>
+               调度方式及性能
+              </td>
+              <td>
+               基于数据库锁，有性能瓶颈
+              </td>
+              <td>
+               基于数据库锁，有性能瓶颈
+              </td>
+              <td>
+               不详
+              </td>
+              <td>
+               <strong>
+                无锁化设计，性能强劲无上限
+               </strong>
+              </td>
+             </tr>
+             <tr>
+              <td>
+               报警监控
+              </td>
+              <td>
+               无
+              </td>
+              <td>
+               邮件
+              </td>
+              <td>
+               短信
+              </td>
+              <td>
+               <strong>
+                邮件，提供接口允许开发者扩展
+               </strong>
+              </td>
+             </tr>
+             <tr>
+              <td>
+               系统依赖
+              </td>
+              <td>
+               关系型数据库（MySQL、Oracle...）
+              </td>
+              <td>
+               MySQL
+              </td>
+              <td>
+               人民币
+              </td>
+              <td>
+               <strong>
+                任意 Spring Data Jpa支持的关系型数据库（MySQL、Oracle...）
+               </strong>
+              </td>
+             </tr>
+             <tr>
+              <td>
+               DAG 工作流
+              </td>
+              <td>
+               不支持
+              </td>
+              <td>
+               不支持
+              </td>
+              <td>
+               支持
+              </td>
+              <td>
+               不支持
+              </td>
+             </tr>
+            </tbody>
+           </table>
+           <p>
+           </p>
+           <h2>
+            四、PowerJob 部署
+           </h2>
+           <h3>
+            4.1 PowerJob 架构
+           </h3>
+           <p>
+            下图是powerjob官方架构图，从架构图颜色可以看出主体就分了两个大块和一小条：调度中心、执行器、Akka，关于其核心的组件做如下介绍说明：
+           </p>
+           <ul>
+            <li>
+             <p>
+              调度中心 powerjob-server
+             </p>
+             <ul>
+              <li>
+               <p>
+                PowerJob 的设计目标为企业级的分布式任务调度平台，即成为调度中间件，让任意业务线的应用仅需要依赖 powerjob-worker 即可获取任务调度与分布式计算的能力。因此，PowerJob 的理想部署模式为一个公司统一部署 powerjob-server 集群，各业务线应用直接接入使用。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              执行器 powerjob-worker
+             </p>
+             <ul>
+              <li>
+               <p>
+                根据以前对定时任务的理解，用过Quartz的话，这里相当于Job这个接口；用过ElasticJob的话，最起码相当于Job接口中的一种，比如SimpleJob接口；用过xxl-job的话，这里也是同理，相当于使用了注解@XxlJob的方法。因此，所有需要执行的任务，mars酱的理解都需要依赖powerjob-worker的。
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              Akka ActorSystem
+             </p>
+             <ul>
+              <li>
+               <p>
+                基于Actor模型设计的，专用于构建高度并发、分布式和弹性的工具包，号称单台机器上高达 200 亿条消息/秒。从架构图来看，PowerJob用来做数据交换传输，这么牛逼的中间协议处理者，看来PowerJob团队一定是想往大了搞的。
+               </p>
+              </li>
+             </ul>
+            </li>
+           </ul>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/a4f9bdbf2b67d3373625600ef3172523.png"/>
+           </p>
+           <p>
+           </p>
+           <h3>
+            4.2 部署方式介绍
+           </h3>
+           <p>
+            PowerJob 提供了多种部署方式，比如以jar包的方式在服务器部署运行，也可以进行docker容器部署。那么部署的是什么呢？实际上就是在上面架构图中介绍的，即powerjob-server。简单理解就是说，powerjob-server就是一个任务调度中心的服务端，通过 powerjob-server，用户可以方便地管理和调度分布式任务，实现任务的高效执行和监控。同时，它支持任务的依赖关系配置、任务失败重试、任务超时处理等功能，能够帮助用户构建稳定可靠的任务调度系统。
+           </p>
+           <blockquote>
+            <p>
+             可对比理解很多技术中间件的服务端，像mysql，es等，都需要先搭建一个服务端，然后应用才能接入进去执行自身的业务操作。
+            </p>
+           </blockquote>
+           <p>
+           </p>
+           <p>
+            <strong>
+             powerjob部署方式：
+            </strong>
+           </p>
+           <ul>
+            <li>
+             <p>
+              本地idea部署
+             </p>
+             <ul>
+              <li>
+               <p>
+                即本地直接运行工程，启动服务端；
+               </p>
+              </li>
+              <li>
+               <p>
+                开发或测试的时候可以使用，生产环境不允许；
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              linux部署
+             </p>
+             <ul>
+              <li>
+               <p>
+                将源码下载之后进行打包构建，然后在linux上启动；
+               </p>
+              </li>
+             </ul>
+            </li>
+            <li>
+             <p>
+              docker部署
+             </p>
+             <ul>
+              <li>
+               <p>
+                通过docker命令启动powerjob-server的镜像；
+               </p>
+              </li>
+             </ul>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <h3>
+            4.3 idea本地部署
+           </h3>
+           <h4>
+            4.3.1 获取源码
+           </h4>
+           <p>
+            通过git或gitee下载源码到本地；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/c5567329c1f707536964ec45763197d5.png"/>
+           </p>
+           <p>
+            这里我使用4.3.9的版本；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/d5c48c83970774256cbc342cd158bbd7.png"/>
+           </p>
+           <p>
+           </p>
+           <h4>
+            4.3.2 导入idea
+           </h4>
+           <p>
+            将工程导入idea之后，工程结构如下，部署测试阶段重点关注下面标注的两个模块：
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/b2d9ce18b3061c62143127ad60c3717a.png"/>
+           </p>
+           <p>
+           </p>
+           <h4>
+            4.3.3 创建数据库
+           </h4>
+           <p>
+            powerjob运行过程中产生的调度数据需要进行持久化存储，因此需要提前创建数据库，在powerjob-server启动时会自动创建数据表。
+           </p>
+           <pre><code>CREATE DATABASE IF NOT EXISTS `powerjob-daily` DEFAULT CHARSET utf8mb4;</code></pre>
+           <p>
+           </p>
+           <h4>
+            4.3.4 修改配置文件
+           </h4>
+           <p>
+            找到下面这个配置文件
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/ac5bb41099a7ceae0825c5f9ff3ed370.png"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            <strong>
+             修改位置1，数据库连接：
+            </strong>
+           </p>
+           <ul>
+            <li>
+             <p>
+              修改数据库连接地址jdbc-url，指向自己的数据库地址；
+             </p>
+            </li>
+            <li>
+             <p>
+              修改数据库连接的用户名和密码；
+             </p>
+            </li>
+           </ul>
+           <pre><code>####### 外部数据库配置（需要用户更改为自己的数据库配置） #######
+spring.datasource.core.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.core.jdbc-url=jdbc:mysql://IP:3306/powerjob-daily?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai
+spring.datasource.core.username=root
+spring.datasource.core.password=root
+spring.datasource.core.maximum-pool-size=20
+spring.datasource.core.minimum-idle=5</code></pre>
+           <p>
+            <strong>
+             修改位置2；
+            </strong>
+           </p>
+           <ul>
+            <li>
+             <p>
+              可以使用mongodb，只需开启一下即可；
+             </p>
+            </li>
+            <li>
+             <p>
+              也可以使用mysql，配置连接一下mysql的连接即可；
+             </p>
+            </li>
+           </ul>
+           <pre><code>####### mongoDB配置，非核心依赖，通过配置 oms.mongodb.enable=false 来关闭 #######
+#oms.storage.dfs.mongodb.uri=mongodb+srv://zqq:No1Bug2Please3!@cluster0.wie54.gcp.mongodb.net/powerjob_daily?retryWrites=true&amp;w=majority
+oms.storage.dfs.mysql_series.driver=com.mysql.cj.jdbc.Driver
+oms.storage.dfs.mysql_series.url=jdbc:mysql://IP:3306/powerjob-daily?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai
+oms.storage.dfs.mysql_series.username=root
+oms.storage.dfs.mysql_series.password=root
+oms.storage.dfs.mysql_series.auto_create_table=true</code></pre>
+           <p>
+            <strong>
+             修改位置3，邮件设置
+            </strong>
+           </p>
+           <pre><code>####### 邮件配置（不需要邮件报警可以删除以下配置来避免报错） #######
+spring.mail.host=smtp.163.com
+spring.mail.username=zqq@163.com
+spring.mail.password=GOFZPNARMVKCGONV
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true</code></pre>
+           <blockquote>
+            <p>
+             其他的配置保持默认即可，用到的时候再配置也可以。
+            </p>
+           </blockquote>
+           <h4>
+            4.3.5 启动服务
+           </h4>
+           <p>
+            powerjob-server-starter模块是一个springboot工程，直接启动即可，启动完成后可以看到相关的数据表初始化出来了；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/056f14e56ab5975281ac5e065018050b.png"/>
+           </p>
+           <p>
+            访问地址：
+            <a href="http://127.0.0.1:7700" title="http://127.0.0.1:7700">
+             http://127.0.0.1:7700
+            </a>
+            ，来到下面的控制台界面；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/c0da63e000a70dbc8d4445de823eb3a0.png"/>
+           </p>
+           <h4>
+            4.3.6 用户注册
+           </h4>
+           <p>
+            注册一个应用，这个应用可以理解为一个账户，注册完成之后，用这个应用账号和密码登录
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/e4ec851428333337123c8163340a2c50.png"/>
+           </p>
+           <p>
+            登录之后就来到控制台主页
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/97a3ee96f472ac047e19212392e81c22.png"/>
+           </p>
+           <p>
+            界面上功能的的具体使用，后文将会陆续提到。
+           </p>
+           <p>
+           </p>
+           <h3>
+            4.4 linux部署
+           </h3>
+           <h4>
+            4.4.1 本地打包
+           </h4>
+           <p>
+            使用maven命令打出jar包
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/099b8a003e299de0232ee6c7d7af5c81.png"/>
+           </p>
+           <h4>
+            4.4.2 上传服务器并启动
+           </h4>
+           <p>
+            这里做下模拟，找到打好的jar，然后使用java -jar命令启动即可
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/6fd62a9a0e59b117dad586b22c595e3d.png"/>
+           </p>
+           <p>
+           </p>
+           <h2>
+            五、PowerJob快速使用
+           </h2>
+           <h3>
+            5.1 新建任务
+           </h3>
+           <p>
+            在任务管理 —&gt;新建任务，创建一个新的任务；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/bcbcf97fd476f667a4c7a00f29f8dfc3.png"/>
+           </p>
+           <p>
+            填写表单参数，注意标注的是非必填的内容，如果不清楚参数含义的话；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/e20c7c7c215b8fe1c085218896109180.png"/>
+           </p>
+           <p>
+            在上面的表单项中，任务每隔10秒执行一次，创建完成之后，在任务列表页就可以看到这条新建的任务。
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/efac6815adf96a368efe5fd29a09f7bd.png"/>
+           </p>
+           <h3>
+            5.2 修改配置文件并启动服务
+           </h3>
+           <p>
+            找到工程中的worker-samples模块，该模块提供了一些测试用的任务样例，即任务的处理器示例，可直接使用；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/6eaf4778c5c712ceae48334f4ddea2df.png"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            使用之前，首先要修改配置文件中的应用名称，使用上午中创建的那个应用；
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/510ed2acea6dcff44af2a83e970ac7af.png"/>
+           </p>
+           <p>
+            我们选择样例中的StandaloneProcessorDemo这个类作为测试，在上面的任务表单参数中，也使用的是这个类的全类名，以上配置都完成之后，运行SampleApplication即可。然后在任务列表中点击运行。
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/0a244ed659d3d8dc7dd5463fe6484bb6.png"/>
+           </p>
+           <p>
+            稍等一会，在控制台上面就能看到类中输出的日志信息，而后按照没10秒的频率输出，同时还将任务中的参数输出了出来。
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/71b99989d13437ea28a9b5ce5bdb308c.png"/>
+           </p>
+           <h3>
+            5.3 任务执行日志
+           </h3>
+           <p>
+            点击任务后的更多—&gt;运行记录，可以查看任务运行时的日志信息。
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/797c09d60db92beda483fd9bcc2d5f0f.png"/>
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/736c8d6308370c653c419f6114a0c422.png"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            点击每一条日志记录进去，可以查看每一条执行日志的详情，如果任务执行过程中有报错也可以通过检查日志进行分析定位。
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/d5b003cadd185778f39812b526afff51.png"/>
+           </p>
+           <p>
+           </p>
+           <h2>
+            六、springboot接入PowerJob
+           </h2>
+           <p>
+            如何基于当前的springboot项目接入PowerJob呢？下面看具体的操作步骤。
+           </p>
+           <p>
+           </p>
+           <h3>
+            6.1 springboot接入PowerJob操作过程
+           </h3>
+           <h4>
+            6.1.1 引入依赖包
+           </h4>
+           <p>
+            依赖包的版本可以根据自身的需求选择，这里选择版本时，尽量与powerjob服务端版本保持一致
+           </p>
+           <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;tech.powerjob&lt;/groupId&gt;
+    &lt;artifactId&gt;powerjob-worker-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;4.3.8&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+           <h4>
+            6.1.2 配置连接信息
+           </h4>
+           <p>
+            注意应用名称填写上面注册的那个应用名称，这里推荐直接将源码中样例的配置文件拿过来稍做修改即可；
+           </p>
+           <pre><code>server.port=7788
+spring.jpa.open-in-view=false
+powerjob.worker.enabled=true
+powerjob.worker.allow-lazy-connect-server=false
+powerjob.worker.port=27777
+powerjob.worker.app-name=app_test
+powerjob.worker.server-address=127.0.0.1:7700,127.0.0.1:7701
+powerjob.worker.protocol=http
+powerjob.worker.store-strategy=disk
+powerjob.worker.max-result-length=4096
+powerjob.worker.max-appended-wf-context-length=4096</code></pre>
+           <h4>
+            6.1.3 自定义执行器类
+           </h4>
+           <p>
+            自定义一个执行器，实现BasicProcessor接口，然后重写里面的process方法，可以参考上面的源码工程中的示例类变现；
+           </p>
+           <pre><code>import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+
+@Component
+@Slf4j
+public class MyProcessor implements BasicProcessor {
+
+    @Override
+    public ProcessResult process(TaskContext taskContext) throws Exception {
+        log.info("MyProcessor fetch ...");
+        return new ProcessResult(true, taskContext + ": ProcessResult fetch success" );
+    }
+}</code></pre>
+           <h4>
+            6.1.4 新建任务并使用自定义执行器
+           </h4>
+           <p>
+            在控制台创建一个新的任务，并使用上述自定义的执行器，如下图
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/72172a78e0397ff22167fcd576def077.png"/>
+           </p>
+           <p>
+           </p>
+           <h4>
+            6.1.5 执行任务
+           </h4>
+           <p>
+            运行springboot工程，启动完成后，选择任务列表中上面的这个自定义执行器任务，点击执行
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/545b9a44be9df150eda1ac9b31b9a4e1.png"/>
+           </p>
+           <p>
+            然后就能看到任务开始执行了，控制台可以看到代码中的日志输出
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/3d19e6b9ae78fe6e9e8bdfbb6d72d4df.png"/>
+           </p>
+           <p>
+            同时任务的执行日志也可以看到详细的执行信息
+           </p>
+           <p>
+            <img alt="" src="https://i-blog.csdnimg.cn/blog_migrate/085104dd71adbbbc96480ea77e395c5b.png"/>
+           </p>
+           <p>
+           </p>
+           <h2>
+            七、写在文末
+           </h2>
+           <p>
+            分布式调度任务在越来越多的业务场景中发挥着重要的作用，在一些大型的平台中，任务调度甚至可以作为一个重要的业务板块承担着不可替代的角色，不管是哪种任务调度框架，掌握其核心的设计思想，才能根据自身的场景选择合理的任务调度框架进行使用，本篇到此结束，感谢观看！
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+          </div>
+         </div>
+         <!-- -->
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="global-modal" data-v-11673da2="">
+    <!-- -->
+   </div>
+  </div>
+ </div>
+ <!-- -->
+ <!-- -->
+ <!-- -->
+ <!-- -->
+ <!-- -->
+ <div>
+ </div>
+ <svg aria-hidden="true" style="position: absolute; width: 0px; height: 0px; overflow: hidden;">
+  <symbol id="sousuo" viewbox="0 0 1024 1024">
+  </symbol>
+  <symbol id="gonggong_csdnlogo_" viewbox="0 0 4096 1024">
+  </symbol>
+  <symbol id="gonggong_csdnlogodanse_" viewbox="0 0 4096 1024">
+  </symbol>
+  <symbol id="xieboke1" viewbox="0 0 1024 1024">
+  </symbol>
+  <symbol id="gitchat" viewbox="0 0 1024 1024">
+  </symbol>
+  <symbol id="toolbar-memberhead" viewbox="0 0 1303 1024">
+  </symbol>
+  <symbol id="toolbar-m-memberhead" viewbox="0 0 1303 1024">
+  </symbol>
+  <symbol id="csdnc-upload" viewbox="0 0 1024 1024">
+  </symbol>
+ </svg>
+</body>
+<!-- -->
+<!-- -->
+<!-- -->
+<!-- -->
+<!-- -->
+<!-- -->
+<!-- -->
+<!-- -->
+<!-- -->

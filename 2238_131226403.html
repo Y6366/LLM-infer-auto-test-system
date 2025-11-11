@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head>
+  <meta charset="utf-8"/>
+  <link href="https://blog.csdn.net/weixin_64144937/article/details/131226403" rel="canonical"/>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+  <meta content="webkit" name="renderer">
+   <meta content="webkit" name="force-rendering">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+    <meta content="always" name="referrer"/>
+    <meta content="no-siteapp" http-equiv="Cache-Control">
+     <link href="#" media="handheld" rel="alternate"/>
+     <meta content="pc" name="applicable-device"/>
+     <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"/>
+     <title>
+      分布式定时任务框架 PowerJob_powerjobclient-CSDN博客
+     </title>
+     <meta content="powerjobclient" name="keywords"/>
+     <meta content='{"autorun":true,"install":true,"keyword":"powerjobclient"}' name="csdn-baidu-search"/>
+     <meta content="文章浏览阅读3.6k次。PowerJob是一个分布式任务调度与计算框架，提供前端Web界面进行任务管理、监控和日志查看。它支持CRON表达式、固定频率等多种定时策略，以及单机、广播、Map/MapReduce等执行模式。此外，PowerJob具备工作流支持、广泛执行器支持和在线日志功能，设计目标是成为企业级的分布式任务调度平台，适用于有定时、分布式处理和故障恢复需求的业务场景。" name="description"/>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-73e475025c.min.css" rel="stylesheet" type="text/css"/>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin-ink/skin-ink-a11cfdaac3.min.css" rel="stylesheet" type="text/css"/>
+     <meta content='{"type":"0","fixModel":"1"}' name="toolbar"/>
+     <link href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css" rel="stylesheet" type="text/css"/>
+     <style>
+      .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+     </style>
+    </meta>
+   </meta>
+  </meta>
+  <style type="text/css">
+   * { user-select: text; } pre{max-height: none!important; overflow-y: hidden;}
+  </style>
+ </head>
+ <body class="nodata" style="">
+  <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css" rel="stylesheet"/>
+  <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css" rel="stylesheet">
+   <link href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css" rel="stylesheet">
+    <div class="main_father clearfix d-flex justify-content-center mainfather-concision" style="height:100%;">
+     <div class="container clearfix container-concision" id="mainBox">
+      <main>
+       <div class="blog-content-box">
+        <div class="article-header-box" id="article-header-box">
+         <div class="article-header">
+          <div class="article-title-box">
+           <h1 class="title-article" id="articleContentId">
+            分布式定时任务框架 PowerJob
+           </h1>
+          </div>
+          <div class="article-info-box">
+           <div class="up-time">
+            最新推荐文章于 2024-08-08 16:29:59 发布
+           </div>
+           <div class="article-bar-top">
+            <div class="bar-content active">
+             <span class="article-type-text original">
+              原创
+             </span>
+             <a class="article-vip-box" data-report-click='{"spm":"3001.10404"}' data-report-query="spm=3001.10404" data-report-view='{"spm":"3001.10404"}' href="https://mall.csdn.net/vip" target="_blank">
+              <img alt="" class="article-vip-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/identityVipNew.png"/>
+             </a>
+             <span class="time blog-postTime" data-time="2023-06-15 14:03:41">
+              最新推荐文章于 2024-08-08 16:29:59 发布
+             </span>
+             <span class="border-dian">
+              ·
+             </span>
+             <span class="read-count">
+              3.6k 阅读
+             </span>
+             <div class="read-count-box is-like like-ab-new" data-type="top">
+              <span class="border-dian">
+               ·
+              </span>
+              <img alt="" class="article-read-img article-heard-img active" id="is-like-imgactive-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Active.png" style="display:none"/>
+              <img alt="" class="article-read-img article-heard-img" id="is-like-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Black.png" style="display:block"/>
+              <span class="read-count" id="blog-digg-num" style="color:;">
+               0
+              </span>
+             </div>
+             <span class="border-dian">
+              ·
+             </span>
+             <a class="un-collection" data-report-click='{"mod":"popu_823","spm":"1001.2101.3001.4232","ab":"new"}' id="blog_detail_zk_collection">
+              <img alt="" class="article-collect-img article-heard-img un-collect-status isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect2.png" style="display:inline-block"/>
+              <img alt="" class="article-collect-img article-heard-img collect-status isactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive2.png" style="display:none"/>
+              <span class="get-collection">
+               7
+              </span>
+             </a>
+             <span class="border-dian">
+              ·
+             </span>
+             <div class="href-article-edit-new">
+              <span class="href-article-edit-click">
+               CC 4.0 BY-SA版权
+              </span>
+              <div class="slide-content-box-new">
+               版权声明：本文为博主原创文章，遵循
+               <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">
+                CC 4.0 BY-SA
+               </a>
+               版权协议，转载请附上原文出处链接和本声明。
+              </div>
+             </div>
+            </div>
+            <div class="operating active">
+            </div>
+           </div>
+           <div class="blog-tags-box">
+            <div class="tags-box artic-tag-box">
+             <div class="article-tag">
+              <span class="label">
+               文章标签：
+              </span>
+              <p>
+               <a class="tag-link-new" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"分布式","ab":"new","extra":"{\"searchword\":\"分布式\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"分布式","ab":"new","extra":"{\"searchword\":\"分布式\"}"}' href="https://so.csdn.net/so/search/s.do?q=%E5%88%86%E5%B8%83%E5%BC%8F&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+                #分布式
+               </a>
+               <a class="tag-link-new" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"数据库","ab":"new","extra":"{\"searchword\":\"数据库\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"数据库","ab":"new","extra":"{\"searchword\":\"数据库\"}"}' href="https://so.csdn.net/so/search/s.do?q=%E6%95%B0%E6%8D%AE%E5%BA%93&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+                #数据库
+               </a>
+               <a class="tag-link-new" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"java","ab":"new","extra":"{\"searchword\":\"java\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"java","ab":"new","extra":"{\"searchword\":\"java\"}"}' href="https://so.csdn.net/so/search/s.do?q=java&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+                #java
+               </a>
+              </p>
+             </div>
+             <p class="community-name" id="community-name">
+             </p>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="" id="blogHuaweiyunAdvert">
+        </div>
+        <div class="ai-abstract-box">
+         <div class="ai-abstract">
+          <div class="abstract-content">
+           <img alt="" class="lock-img" src="https://i-operation.csdnimg.cn/images/a7311a21245d4888a669ca3155f1f4e5.png"/>
+           PowerJob是一个分布式任务调度与计算框架，提供前端Web界面进行任务管理、监控和日志查看。它支持CRON表达式、固定频率等多种定时策略，以及单机、广播、Map/MapReduce等执行模式。此外，PowerJob具备工作流支持、广泛执行器支持和在线日志功能，设计目标是成为企业级的分布式任务调度平台，适用于有定时、分布式处理和故障恢复需求的业务场景。
+          </div>
+         </div>
+        </div>
+        <article class="baidu_pl">
+         <div class="article_content clearfix" id="article_content">
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css" rel="stylesheet"/>
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-10bf609291.css" rel="stylesheet"/>
+          <div class="htmledit_views tomorrow-night" id="content_views">
+           <h2>
+            业务背景
+           </h2>
+           <p>
+            1.1 为什么需要使用定时任务调度
+            <br/>
+            （1）时间驱动处理场景：整点发送优惠券，每天更新收益，每天刷新标签数据和人群数据。
+            <br/>
+            （2）批量处理数据：按月批量统计报表数据，批量更新短信状态，实时性要求不高。
+            <br/>
+            （3）异步执行解耦：活动状态刷新，异步执行离线查询，与内部逻辑解耦。
+            <br/>
+            1.2 使用需求和痛点
+            <br/>
+            （1）任务执行监控告警能力。
+            <br/>
+            （2）任务可灵活动态配置，无需重启。
+            <br/>
+            （3）业务透明，低耦合，配置精简，开发方便。
+            <br/>
+            （4）易测试。
+            <br/>
+            （5）高可用，无单点故障。
+            <br/>
+            （6）任务不可重复执行，防止逻辑异常。
+            <br/>
+            （7）大任务的分发并行处理能力。
+           </p>
+           <h2>
+            开源框架实践与探索
+           </h2>
+           <p>
+            Java 原生 Timer 和ScheduledExecutorService
+            <br/>
+            Timer使用
+           </p>
+           <p>
+            Timer缺陷：
+           </p>
+           <p>
+            Timer底层是使用单线程来处理多个Timer任务，这意味着所有任务实际上都是串行执行，前一个任务的延迟会影响到之后的任务的执行。
+           </p>
+           <p>
+            由于单线程的缘故，一旦某个定时任务在运行时，产生未处理的异常，那么不仅当前这个线程会停止，所有的定时任务都会停止。
+           </p>
+           <p>
+            Timer任务执行是依赖于系统绝对时间，系统时间变化会导致执行计划的变更。
+           </p>
+           <p>
+            由于上述缺陷，尽量不要使用Timer， idea中也会明确提示，使用ScheduledThreadPoolExecutor替代Timer
+           </p>
+           <p>
+            ScheduledExecutorService使用
+            <br/>
+            ScheduledExecutorService对于Timer的缺陷进行了修补，首先ScheduledExecutorService内部实现是ScheduledThreadPool线程池，可以支持多个任务并发执行。
+           </p>
+           <p>
+            对于某一个线程执行的任务出现异常，也会处理，不会影响其他线程任务的执行，另外ScheduledExecutorService是基于时间间隔的延迟，执行不会由于系统时间的改变发生变化。
+           </p>
+           <p>
+            当然，ScheduledExecutorService也有自己的局限性：只能根据任务的延迟来进行调度，无法满足基于绝对时间和日历调度的需求。
+            <br/>
+            Spring Task
+            <br/>
+            Spring Task 使用
+            <br/>
+            spring task 是spring自主开发的轻量级定时任务框架，不需要依赖其他额外的包，配置较为简单。
+            <br/>
+            此处使用注解配置
+            <br/>
+            Spring Task缺陷
+            <br/>
+            Spring Task 本身不支持持久化，也没有推出官方的分布式集群模式，只能靠开发者在业务应用中自己手动扩展实现，无法满足可视化，易配置的需求。
+           </p>
+           <h2 id="9NvH4">
+            项目介绍
+           </h2>
+           <h3 id="8q38x">
+            产品特性
+           </h3>
+           <p id="2210a91a128e48108b673e73a76ba176">
+            <a href="https://github.com/KFCFans/PowerJob" title="PowerJob">
+             PowerJob
+            </a>
+            <strong>
+             （原OhMyScheduler）
+            </strong>
+            <strong>
+             是全新一代分布式任务调度与计算框架，其主要功能特性如下
+            </strong>
+            ：
+           </p>
+           <ul>
+            <li id="d2d0133fe8cd5732caed325ef7677851">
+             使用简单：提供前端Web界面，允许开发者可视化地完成调度任务的管理（增、删、改、查）、任务运行状态监控和运行日志查看等功能。
+            </li>
+            <li id="a828b3bc0eb90374d287522696c16fd7">
+             定时策略完善：支持 CRON 表达式、固定频率、固定延迟和API四种定时调度策略。
+            </li>
+            <li id="ea4c6921f69add7b00a1f43bc3f4e233">
+             执行模式丰富：支持单机、广播、Map、MapReduce 四种执行模式，
+             <strong>
+              其中 Map/MapReduce 处理器能使开发者寥寥数行代码便获得集群分布式计算的能力
+             </strong>
+             。
+            </li>
+            <li id="87ea95c18f0c667cc328427c1d0ed57a">
+             <strong>
+              工作流支持
+             </strong>
+             ：支持在线配置任务依赖关系（DAG），以可视化的方式对任务进行编排，同时还支持上下游任务间的数据传递，以及多种节点类型（判断节点 &amp; 嵌套工作流节点）。
+            </li>
+            <li id="6dae93bfe91d5db91399ee0f81cb5337">
+             执行器支持广泛：支持 Spring Bean、内置/外置 Java 类，另外可以通过引入官方提供的依赖包，一键集成 Shell、Python、HTTP、SQL 等处理器，应用范围广。
+            </li>
+            <li id="54e451d0f54f78adb787ac7c8c3b1fc5">
+             运维便捷：支持
+             <strong>
+              在线日志
+             </strong>
+             功能，执行器产生的日志可以在前端控制台页面实时显示，降低 debug 成本，极大地提高开发效率。
+            </li>
+            <li id="e7a306671fe1504169877d672e28b6c6">
+             依赖精简：
+             <strong>
+              最小仅依赖关系型数据库（MySQL/
+             </strong>
+             <strong>
+              P
+             </strong>
+             <strong>
+              ostgreSQL
+             </strong>
+             <strong>
+              /Oracle/MS SQLServer...）
+             </strong>
+            </li>
+            <li id="13dedc0e0f83032c835ae0696e5ec11c">
+             高可用 &amp; 高性能：调度服务器经过精心设计，一改其他调度框架基于数据库锁的策略，实现了无锁化调度。部署多个调度服务器可以同时实现高可用和性能的提升（支持无限的水平扩展）。
+            </li>
+            <li id="c1ecaaae1e5b28804a0b0f08d97240a8">
+             故障转移与恢复：任务执行失败后，可根据配置的重试策略完成重试，只要执行器集群有足够的计算节点，任务就能顺利完成。
+            </li>
+           </ul>
+           <h3 id="SWV2V">
+            适用场景
+           </h3>
+           <ul>
+            <li id="d2a5d63e912ac4aa4149f61287476586">
+             有定时执行需求的业务场景：如每天凌晨全量同步数据、生成业务报表、未支付订单超时取消等。
+            </li>
+            <li id="1981b110b54f1fd7c60b1d38c1c793f8">
+             有需要全部机器一同执行的业务场景：如使用广播执行模式清理集群日志。
+            </li>
+            <li id="61255c5c5eaed1d71384796ae030f0a9">
+             有需要分布式处理的业务场景：比如需要更新一大批数据，单机执行耗时非常长，可以使用Map/MapReduce 处理器完成任务的分发，调动整个集群加速计算。
+            </li>
+            <li id="194e2c8b223e5efc1e4dbf2e213f286f">
+             有需要
+             <strong>
+              延迟执行
+             </strong>
+             某些任务的业务场景：比如订单过期处理等。
+            </li>
+           </ul>
+           <h3 id="azmqk">
+            设计目标
+           </h3>
+           <p id="85b6f3ff6e072ebc35579ced511514aa">
+            PowerJob 的设计目标为
+            <strong>
+             企业级的分布式任务调度平台
+            </strong>
+            ，即成为公司内部的
+            <strong>
+             任务调度中间件
+            </strong>
+            。整个公司统一部署调度中心 powerjob-server，旗下所有业务线应用只需要依赖 powerjob-worker 即可接入调度中心获取任务调度与分布式计算能力。
+           </p>
+           <h3 id="EyAvZ">
+            同类产品对比
+           </h3>
+           <p>
+            <img alt="" height="1098" src="https://i-blog.csdnimg.cn/blog_migrate/c21b282408486e7eab1808d71d518e69.png" width="1200"/>
+           </p>
+           <h2 id="yKu80">
+            基本概念（非常重要，请仔细阅读）
+           </h2>
+           <p id="0309b8b0b892ad30341772833f62c07d">
+            <strong>
+             分组概念：
+            </strong>
+           </p>
+           <ul>
+            <li id="8c21ffc9b440f460d4f1b2ec3c8aecfa">
+             appName：应用名称，建议与用户实际接入 PowerJob 的应用名称保持一致，用于
+             <strong>
+              业务分组与隔离
+             </strong>
+             。
+             <strong>
+              一个 appName 等于一个业务集群，也就是实际的一个 Java 项目
+             </strong>
+             。
+            </li>
+           </ul>
+           <p id="b4f6ec3b55c310b7b04078575a372095">
+            <strong>
+             核心概念：
+            </strong>
+           </p>
+           <ul>
+            <li id="9298b4d88ae16dee5ac841cff8dd7bcb">
+             任务（Job）：描述了需要被 PowerJob 调度的任务信息，包括任务名称、调度时间、处理器信息等。
+            </li>
+            <li id="b8830fdc521cf93057fb697f9d45a4e6">
+             任务实例（ JobInstance，简称 Instance）：任务（Job）被调度执行后会生成任务实例（Instance），任务实例记录了任务的运行时信息（任务与任务实例的关系类似于类与对象的关系）。
+            </li>
+            <li id="e9e673de6b5854f3427f9c7dbca42344">
+             作业（Task）：任务实例的执行单元，一个 JobInstance 存在至少一个 Task，具体规则如下：
+            </li>
+           </ul>
+           <ul>
+            <li>
+             <ul>
+              <li id="3690663ae4f0e0a83772418b92da73db">
+               单机任务（STANDALONE）：一个 JobInstance 对应一个 Task
+              </li>
+              <li id="68a34ea74445a6156b551fb720a0e001">
+               广播任务（BROADCAST）：一个 JobInstance 对应 N 个 Task，N为集群机器数量，即每一台机器都会生成一个 Task
+              </li>
+              <li id="12a4e9c527f9813470d0d834da17993e">
+               Map/MapReduce任务：一个 JobInstance 对应若干个 Task，由开发者手动 map 产生
+              </li>
+             </ul>
+            </li>
+           </ul>
+           <ul>
+            <li id="666780997054f7a24264dc28fd298196">
+             工作流（Workflow）：由 DAG（有向无环图）描述的一组任务（Job），用于任务编排。
+            </li>
+            <li id="7346071cb4282f6f2a9286c7877443c5">
+             工作流实例（WorkflowInstance）：工作流被调度执行后会生成工作流实例，记录了工作流的运行时信息。
+            </li>
+           </ul>
+           <p id="28562f7ddba3544bd580b0901518daf2">
+            <strong>
+             扩展概念
+            </strong>
+           </p>
+           <ul>
+            <li id="8150070834ae854470ed6c0a00ffc1fd">
+             JVM 容器：以 Maven 工程项目的维度组织一堆 Java 文件（开发者开发的众多 Java 处理器），可以通过前端网页动态发布并被执行器加载，具有极强的扩展能力和灵活性。
+            </li>
+            <li id="ecce89e0722a5dc2c20aa405e3064aa5">
+             OpenAPI：允许开发者通过接口来完成手工的操作，让系统整体变得更加灵活。开发者可以基于 API 便捷地扩展 PowerJob 原有的功能。
+            </li>
+            <li id="u9268fe32">
+             轻量级任务：单机执行且不需要以固定频率或者固定延迟执行的任务 （&gt;= v4.2.1）
+            </li>
+            <li id="ucb10e0a5">
+             重量级任务：非单机执行或者以固定频率/延迟执行的任务 （&gt;= v4.2.1）
+            </li>
+           </ul>
+           <p id="e2f97b37502d209cde18ca286c1597ed">
+            <strong>
+             定时任务类型
+            </strong>
+           </p>
+           <ul>
+            <li id="37b535e36e6ef2ceb3b2547e6add4cbf">
+             API：该任务只会由 powerjob-client 中提供的 OpenAPI 接口触发，server 不会主动调度。
+            </li>
+            <li id="c2def1d5332feac89001cd74a587420a">
+             CRON：该任务的调度时间由 CRON 表达式指定。
+            </li>
+            <li id="10011d6f017073723d4a543f39b7ac8b">
+             固定频率：秒级任务，每隔多少毫秒运行一次，功能与 java.util.concurrent.ScheduledExecutorService#scheduleAtFixedRate 相同。
+            </li>
+            <li id="1e436947df3337af63ca578eba71a241">
+             固定延迟：秒级任务，延迟多少毫秒运行一次，功能与 java.util.concurrent.ScheduledExecutorService#scheduleWithFixedDelay 相同。
+            </li>
+            <li id="b787a5903dcc4a282a9a3c7f5aa5bf0a">
+             工作流：该任务只会由其所属的工作流调度执行，server 不会主动调度该任务。如果该任务不属于任何一个工作流，该任务就不会被调度。
+            </li>
+           </ul>
+           <p id="ce22863aebac03b6e275722451ccac4e">
+            备注：固定延迟和固定频率任务统称秒级任务，这两种任务无法被停止，
+            <strong>
+             只有任务被关闭或删除时才能真正停止任务
+            </strong>
+            。
+           </p>
+           <h2 id="XUBF4">
+            项目地址
+           </h2>
+           <p id="1131588f4721f648435a2b41a457b24f">
+            求 Star ～OvO～
+           </p>
+           <p id="6ed3013f111e6d68183820e7f0c0fdf5">
+            PowerJob 主项目：
+            <a href="https://github.com/PowerJob/PowerJob" title="GitHub - PowerJob/PowerJob: Enterprise job scheduling middleware with distributed computing ability.">
+             GitHub - PowerJob/PowerJob: Enterprise job scheduling middleware with distributed computing ability.
+            </a>
+           </p>
+           <p id="50e55458ff5cded23806bbbb85bdd426">
+            PowerJob 前端项目：
+            <a href="https://github.com/PowerJob/PowerJob-Console" title="GitHub - PowerJob/PowerJob-Console: 分布式任务调度与计算框架（PowerJob）前端界面">
+             GitHub - PowerJob/PowerJob-Console: 分布式任务调度与计算框架（PowerJob）前端界面
+            </a>
+           </p>
+           <p id="fb4aa90c5f2ba477924b42efc4dcf512">
+            PowerJob 官网项目：
+            <a href="https://github.com/PowerJob/Official-Website" title="GitHub - PowerJob/Official-Website: PowerJob官网页面前端，官网地址为http://www.powerjob.tech/">
+             GitHub - PowerJob/Official-Website: PowerJob官网页面前端，官网地址为http://www.powerjob.tech/
+            </a>
+           </p>
+           <h2 id="mKBC6">
+            项目结构说明
+           </h2>
+           <p id="96867abd1f5883732abacb587eeaf64b">
+            本项目由主体项目（
+            <a href="https://github.com/PowerJob/PowerJob" title="PowerJob">
+             PowerJob
+            </a>
+            ）和前端项目（
+            <a href="https://github.com/PowerJob/PowerJob-Console" title="PowerJob-Console">
+             PowerJob-Console
+            </a>
+            ）构成，其中，PowerJob各模块说明如下:
+            <br/>
+           </p>
+           <pre><code class="hljs">├── LICENSE
+├── powerjob-client // powerjob-client，普通Jar包，提供 OpenAPI
+├── powerjob-common // 各组件的公共依赖，开发者无需感知
+├── powerjob-remote // 内部通讯层框架，开发者无需感知
+├── powerjob-server // powerjob-server，基于SpringBoot实现的调度服务器
+├── powerjob-worker // powerjob-worker, 普通Jar包，接入powerjob-server的应用需要依赖该Jar包
+├── powerjob-worker-agent // powerjob-agent，可执行Jar文件，可直接接入powerjob-server的代理应用
+├── powerjob-worker-samples // 教程项目，包含了各种Java处理器的编写样例
+├── powerjob-worker-spring-boot-starter // powerjob-worker 的 spring-boot-starter ，spring boot 应用可以通用引入该依赖一键接入 powerjob-server
+├── powerjob-official-processors // 官方处理器，包含一系列常用的 Processor，依赖该 jar 包即可使用
+├── others
+└── pom.xml
+</code></pre>
+          </div>
+         </div>
+        </article>
+       </div>
+       <div class="directory-boxshadow-dialog" style="display:none;">
+        <div class="directory-boxshadow-dialog-box">
+        </div>
+        <div class="vip-limited-time-offer-box-new" id="vip-limited-time-offer-box-new">
+         <img class="limited-img limited-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-newWhite.png"/>
+         <div class="vip-limited-time-top">
+          确定要放弃本次机会？
+         </div>
+         <span class="vip-limited-time-text">
+          福利倒计时
+         </span>
+         <div class="limited-time-box-new">
+          <span class="time-hour">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-minite">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-second">
+          </span>
+         </div>
+         <div class="limited-time-vip-box">
+          <p>
+           <img class="coupon-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-roup.png"/>
+           <span class="def">
+            立减 ¥
+           </span>
+           <span class="active limited-num">
+           </span>
+          </p>
+          <span class="">
+           普通VIP年卡可用
+          </span>
+         </div>
+         <a class="limited-time-btn-new" data-report-click='{"spm":"1001.2101.3001.9621"}' data-report-query="spm=1001.2101.3001.9621" href="https://mall.csdn.net/vip">
+          立即使用
+         </a>
+        </div>
+       </div>
+       <a id="commentBox" name="commentBox">
+       </a>
+      </main>
+     </div>
+     <div class="recommend-right1 align-items-stretch clearfix" data-type="recommend" id="rightAsideConcision">
+      <aside class="recommend-right_aside">
+       <div id="recommend-right-concision">
+        <div class="flex-column aside-box groupfile" id="groupfileConcision">
+         <div class="groupfile-div1">
+          <h3 class="aside-title">
+           目录
+          </h3>
+          <div class="align-items-stretch group_item">
+           <div class="pos-box">
+            <div class="scroll-box">
+             <div class="toc-box">
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </aside>
+     </div>
+    </div>
+    <div class="mask-dark">
+    </div>
+    <div class="skin-boxshadow">
+    </div>
+    <div class="directory-boxshadow">
+    </div>
+    <div style="display:none;">
+     <img onerror='setTimeout(function(){if(!/(csdn.net|iteye.com|baiducontent.com|googleusercontent.com|360webcache.com|sogoucdn.com|bingj.com|baidu.com)$/.test(window.location.hostname)){window="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74"}},3000);' src=""/>
+    </div>
+    <div class="keyword-dec-box" id="keywordDecBox">
+    </div>
+   </link>
+  </link>
+ </body>
+ <!-- 富文本柱状图  -->
+ <link href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css" rel="stylesheet">
+  <link href="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.css" rel="stylesheet"/>
+  <link href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/tomorrow-night.css" rel="stylesheet"/>
+ </link>
+</html>

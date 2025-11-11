@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head>
+  <meta charset="utf-8"/>
+  <link href="https://blog.csdn.net/qq3892997/article/details/132471537" rel="canonical"/>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+  <meta content="webkit" name="renderer">
+   <meta content="webkit" name="force-rendering">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+    <meta content="always" name="referrer"/>
+    <meta content="no-siteapp" http-equiv="Cache-Control">
+     <link href="#" media="handheld" rel="alternate"/>
+     <meta content="pc" name="applicable-device"/>
+     <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"/>
+     <title>
+      PowerJob容器的使用（创建一个外置动态加载的任务）_powerjob的动态容器-CSDN博客
+     </title>
+     <meta content="powerjob的动态容器" name="keywords"/>
+     <meta content='{"autorun":true,"install":true,"keyword":"powerjob的动态容器"}' name="csdn-baidu-search"/>
+     <meta content="文章浏览阅读732次。本文详细介绍了如何使用PowerJob容器进行外置动态加载任务的部署。步骤包括利用容器模板生成项目，导入IDEA下载依赖，打包成jar，上传到容器，启动并部署，以及修改执行配置为动态加载，最终成功运行并查看日志。" name="description"/>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-73e475025c.min.css" rel="stylesheet" type="text/css"/>
+     <style>
+      #content_views{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+     </style>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin-yellow/skin-yellow-28d34ab5fa.min.css" rel="stylesheet" type="text/css"/>
+     <meta content='{"type":"0","fixModel":"1"}' name="toolbar"/>
+     <link href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css" rel="stylesheet" type="text/css"/>
+     <style>
+      .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+     </style>
+    </meta>
+   </meta>
+  </meta>
+  <style type="text/css">
+   * { user-select: text; } pre{max-height: none!important; overflow-y: hidden;}
+  </style>
+ </head>
+ <body class="nodata" style="">
+  <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css" rel="stylesheet"/>
+  <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css" rel="stylesheet">
+   <link href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css" rel="stylesheet">
+    <div class="main_father clearfix d-flex justify-content-center mainfather-concision" style="height:100%;">
+     <div class="container clearfix container-concision" id="mainBox">
+      <main>
+       <div class="blog-content-box">
+        <div class="article-header-box">
+         <div class="article-header">
+          <div class="article-title-box">
+           <h1 class="title-article" id="articleContentId">
+            PowerJob容器的使用（创建一个外置动态加载的任务）
+           </h1>
+          </div>
+          <div class="article-info-box">
+           <div class="article-bar-top-box">
+            <div class="article-bar-top">
+             <img alt="" class="article-type-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/original.png"/>
+             <div class="bar-content">
+              <a class="follow-nickName" href="https://blog.csdn.net/qq3892997" rel="noopener" target="_blank" title="往事不堪回首..">
+               往事不堪回首..
+              </a>
+              <img alt="" class="article-time-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUpTime2.png"/>
+              <span class="time">
+               已于 2023-08-25 11:02:23 修改
+              </span>
+              <div class="read-count-box">
+               <img alt="" class="article-read-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/articleReadEyes2.png"/>
+               <span class="read-count">
+                阅读量732
+               </span>
+               <a class="un-collection" data-report-click='{"mod":"popu_823","spm":"1001.2101.3001.4232","ab":"new"}' id="blog_detail_zk_collection">
+                <img alt="" class="article-collect-img article-heard-img un-collect-status isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect2.png" style="display:inline-block"/>
+                <img alt="" class="article-collect-img article-heard-img collect-status isactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive2.png" style="display:none"/>
+                <span class="name">
+                 收藏
+                </span>
+                <span class="get-collection">
+                </span>
+               </a>
+               <div class="read-count-box is-like" data-type="top">
+                <img alt="" class="article-read-img article-heard-img" id="is-like-imgactive-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Active.png" style="display:none"/>
+                <img alt="" class="article-read-img article-heard-img" id="is-like-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Black.png" style="display:block"/>
+                <span class="read-count" id="blog-digg-num">
+                 点赞数
+                </span>
+               </div>
+              </div>
+             </div>
+            </div>
+            <div class="operating">
+             <a class="href-article-edit slide-toggle">
+              CC 4.0 BY-SA版权
+             </a>
+            </div>
+           </div>
+           <div class="blog-tags-box">
+            <div class="tags-box artic-tag-box">
+             <span class="label">
+              分类专栏：
+             </span>
+             <a class="tag-link" href="https://blog.csdn.net/qq3892997/category_11124783.html" rel="noopener" target="_blank">
+              定时任务
+             </a>
+             <span class="label">
+              文章标签：
+             </span>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"PowerJob","ab":"new","extra":"{\"searchword\":\"PowerJob\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"PowerJob","ab":"new","extra":"{\"searchword\":\"PowerJob\"}"}' href="https://so.csdn.net/so/search/s.do?q=PowerJob&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              PowerJob
+             </a>
+             <a class="tag-link" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"定时任务调度","ab":"new","extra":"{\"searchword\":\"定时任务调度\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"定时任务调度","ab":"new","extra":"{\"searchword\":\"定时任务调度\"}"}' href="https://so.csdn.net/so/search/s.do?q=%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+              定时任务调度
+             </a>
+            </div>
+           </div>
+           <div class="up-time">
+            <span>
+             于 2023-08-24 12:29:58 首次发布
+            </span>
+           </div>
+           <div class="slide-content-box">
+            <div class="article-copyright">
+             <div class="creativecommons">
+              版权声明：本文为博主原创文章，遵循
+              <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">
+               CC 4.0 BY-SA
+              </a>
+              版权协议，转载请附上原文出处链接和本声明。
+             </div>
+             <div class="article-source-link">
+              本文链接：
+              <a href="https://blog.csdn.net/qq3892997/article/details/132471537" target="_blank">
+               https://blog.csdn.net/qq3892997/article/details/132471537
+              </a>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="" id="blogHuaweiyunAdvert">
+        </div>
+        <div class="" id="blogColumnPayAdvert">
+         <div class="column-group">
+          <div class="column-group-item column-group0 column-group-item-one">
+           <div class="item-l">
+            <a class="item-target" data-report-click='{"spm":"1001.2101.3001.6332"}' data-report-view='{"spm":"1001.2101.3001.6332"}' href="https://blog.csdn.net/qq3892997/category_11124783.html" target="_blank" title="定时任务">
+             <img alt="" class="item-target" src="https://i-blog.csdnimg.cn/blog_column_migrate/50ebd4af1d8ce5bdece6406b1f1ca55c.png?x-oss-process=image/resize,m_fixed,h_224,w_224"/>
+             <span class="title item-target">
+              <span>
+               <span class="tit">
+                定时任务
+               </span>
+               <span class="dec">
+                专栏收录该内容
+               </span>
+              </span>
+             </span>
+            </a>
+           </div>
+           <div class="item-m">
+            <span>
+             8 篇文章
+            </span>
+            <span class="old-add-new-box">
+             <span class="price">
+              ¥9.90
+             </span>
+             <span class="oldprice">
+              ¥99.00
+             </span>
+            </span>
+           </div>
+           <div class="item-r">
+            <a class="item-target article-column-subscribe">
+             已订阅
+            </a>
+            <a class="item-target column-studyvip-discount column-studyvip-pass" data-report-click='{"spm":"1001.2015.3001.8590"}' data-report-view='{"spm":"1001.2015.3001.8590"}'>
+             8折续费
+            </a>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="learning_the_member_box">
+         <a href="https://www.csdn.net/vip?utm_source=bkzl_cjhy_ckqy" target="_blank">
+          <div class="left">
+           <img alt="" src="https://csdnimg.cn/release/blogv2/dist/pc/img/iconVIpCrown.png"/>
+           <span>
+            您已是超级会员，正在免费阅读会员专享内容
+           </span>
+          </div>
+          <div class="right">
+           <span>
+            查看更多超级会员权益
+           </span>
+           <img alt="" src="https://csdnimg.cn/release/blogv2/dist/components/img/vipIconArrowLeftWhite.png"/>
+          </div>
+         </a>
+        </div>
+        <div class="ai-abstract-box">
+         <div class="ai-abstract">
+          <div class="abstract-content">
+           <img alt="" class="lock-img" src="https://i-operation.csdnimg.cn/images/a7311a21245d4888a669ca3155f1f4e5.png"/>
+           本文详细介绍了如何使用PowerJob容器进行外置动态加载任务的部署。步骤包括利用容器模板生成项目，导入IDEA下载依赖，打包成jar，上传到容器，启动并部署，以及修改执行配置为动态加载，最终成功运行并查看日志。
+          </div>
+         </div>
+        </div>
+        <article class="baidu_pl">
+         <div class="article_content clearfix" id="article_content">
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css" rel="stylesheet"/>
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-10bf609291.css" rel="stylesheet"/>
+          <div class="htmledit_views atom-one-light" id="content_views">
+           <h3>
+            1.使用容器的模板生成功能
+           </h3>
+           <p>
+            <img alt="" height="746" src="https://i-blog.csdnimg.cn/blog_migrate/046df9e48757dd40baec6376e8144a97.png" width="1200"/>
+           </p>
+           <h3>
+            2. 解压导入到IDEA中，下载依赖，添加处理器
+           </h3>
+           <p>
+            <img alt="" height="548" src="https://i-blog.csdnimg.cn/blog_migrate/7c99ffee93eee1ca597a21cd7971ab24.png" width="1200"/>
+           </p>
+           <p>
+            <img alt="" height="587" src="https://i-blog.csdnimg.cn/blog_migrate/857afd8f2dfab9f3bb54fec1f21fb108.png" width="984"/>
+           </p>
+           <h3>
+            3. 打包成jar
+           </h3>
+           <p>
+            <img alt="" height="941" src="https://i-blog.csdnimg.cn/blog_migrate/b4686be9f6d86aa3984b8eab3f2b4bdc.png" width="1200"/>
+           </p>
+           <h3>
+            4.  上传项目到容器
+           </h3>
+           <p>
+            <img alt="" height="624" src="https://i-blog.csdnimg.cn/blog_migrate/9714853a30ae397783594d70fc4c0607.png" width="1200"/>
+           </p>
+           <p>
+            <img alt="" height="625" src="https://i-blog.csdnimg.cn/blog_migrate/3fa810a4659484d2e0d352f0afe29551.png" width="593"/>
+           </p>
+           <h3>
+            5. 启动容器--部署jar
+           </h3>
+           <p>
+            <img alt="" height="534" src="https://i-blog.csdnimg.cn/blog_migrate/0e2ff2fba37324404751d9de49d1281c.png" width="1200"/>
+           </p>
+           <h3>
+            6. 复制一份
+            <a class="link-info" href="https://blog.csdn.net/qq3892997/article/details/132466165" title="上篇文章">
+             上篇文章
+            </a>
+            写的测试单机执行的任务实例，把执行配置修改从外置（动态加载） ，设置全类路径
+            <span style="background-color:#38d8f0;">
+             （与内置的写法不同，需要在全类之前加上容器ID）
+            </span>
+           </h3>
+           <p>
+            <img alt="" height="66" src="https://i-blog.csdnimg.cn/blog_migrate/50d81829e6908799a7e6d1d648b9f39d.png" width="841"/>
+           </p>
+           <h3>
+            7. 运行，查看运行日志
+            <img alt="" height="223" src="https://i-blog.csdnimg.cn/blog_migrate/28c68ff45556b41ed49ea75fd88136f7.png" width="1200"/>
+           </h3>
+           <p>
+            <img alt="" height="376" src="https://i-blog.csdnimg.cn/blog_migrate/2fdd663b4069f9057d89947ff63d8e05.png" width="1200"/>
+           </p>
+           <h3>
+            至此，使用容器部署外置动态java项目就完成了
+           </h3>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+          </div>
+         </div>
+        </article>
+       </div>
+       <div class="directory-boxshadow-dialog" style="display:none;">
+        <div class="directory-boxshadow-dialog-box">
+        </div>
+        <div class="vip-limited-time-offer-box-new" id="vip-limited-time-offer-box-new">
+         <img class="limited-img limited-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-newWhite.png"/>
+         <div class="vip-limited-time-top">
+          确定要放弃本次机会？
+         </div>
+         <span class="vip-limited-time-text">
+          福利倒计时
+         </span>
+         <div class="limited-time-box-new">
+          <span class="time-hour">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-minite">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-second">
+          </span>
+         </div>
+         <div class="limited-time-vip-box">
+          <p>
+           <img class="coupon-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-roup.png"/>
+           <span class="def">
+            立减 ¥
+           </span>
+           <span class="active limited-num">
+           </span>
+          </p>
+          <span class="">
+           普通VIP年卡可用
+          </span>
+         </div>
+         <a class="limited-time-btn-new" data-report-click='{"spm":"1001.2101.3001.9621"}' data-report-query="spm=1001.2101.3001.9621" href="https://mall.csdn.net/vip">
+          立即使用
+         </a>
+        </div>
+       </div>
+       <a id="commentBox" name="commentBox">
+       </a>
+      </main>
+     </div>
+     <div class="recommend-right1 align-items-stretch clearfix" data-type="recommend" id="rightAsideConcision">
+      <aside class="recommend-right_aside">
+       <div id="recommend-right-concision">
+        <div class="flex-column aside-box groupfile" id="groupfileConcision">
+         <div class="groupfile-div1">
+          <h3 class="aside-title">
+           目录
+          </h3>
+          <div class="align-items-stretch group_item">
+           <div class="pos-box">
+            <div class="scroll-box">
+             <div class="toc-box">
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </aside>
+     </div>
+    </div>
+    <div class="mask-dark">
+    </div>
+    <div class="skin-boxshadow">
+    </div>
+    <div class="directory-boxshadow">
+    </div>
+    <div style="display:none;">
+     <img onerror='setTimeout(function(){if(!/(csdn.net|iteye.com|baiducontent.com|googleusercontent.com|360webcache.com|sogoucdn.com|bingj.com|baidu.com)$/.test(window.location.hostname)){window="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74"}},3000);' src=""/>
+    </div>
+    <div class="keyword-dec-box" id="keywordDecBox">
+    </div>
+   </link>
+  </link>
+ </body>
+ <!-- 富文本柱状图  -->
+ <link href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css" rel="stylesheet">
+  <link href="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.css" rel="stylesheet"/>
+  <link href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-light.css" rel="stylesheet"/>
+ </link>
+</html>

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head>
+  <meta charset="utf-8"/>
+  <link href="https://blog.csdn.net/cgk_alem/article/details/143690655" rel="canonical"/>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+  <meta content="webkit" name="renderer">
+   <meta content="webkit" name="force-rendering">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+    <meta content="always" name="referrer"/>
+    <meta content="no-siteapp" http-equiv="Cache-Control">
+     <link href="#" media="handheld" rel="alternate"/>
+     <meta content="pc" name="applicable-device"/>
+     <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"/>
+     <title>
+      PowerJob-CSDN博客
+     </title>
+     <meta content="PowerJob" name="keywords"/>
+     <meta content='{"autorun":true,"install":true,"keyword":"powerjob外部任务"}' name="csdn-baidu-search"/>
+     <meta content="文章浏览阅读923次，点赞14次，收藏22次。完成配置文件的修改后，可以直接通过启动类com.github.kfcfans.powerjob.server.OhMyApplication启动调度服务器，观察启动日志，查看是否启动成功～启动成功后，访问 http://127.0.0.1:7700/ ，如果能顺利出现Web界面，则说明调度服务器启动成功！编写自己的处理器：随便找个地方新建类，继承你想要使用的处理器（各个处理器的介绍可见官方文档，文档非常详细），这里为了简单演示，选择使用单机处理器BasicProcessor，以下是代码示例。" name="description"/>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-73e475025c.min.css" rel="stylesheet" type="text/css"/>
+     <link href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin-number/skin-number-2c93789924.min.css" rel="stylesheet" type="text/css"/>
+     <meta content='{"type":"0","fixModel":"1"}' name="toolbar"/>
+     <link href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css" rel="stylesheet" type="text/css"/>
+     <style>
+      .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+     </style>
+    </meta>
+   </meta>
+  </meta>
+  <style type="text/css">
+   * { user-select: text; } pre{max-height: none!important; overflow-y: hidden;}
+  </style>
+ </head>
+ <body class="nodata" style="">
+  <link href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css" rel="stylesheet"/>
+  <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css" rel="stylesheet">
+   <link href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css" rel="stylesheet">
+    <div class="main_father clearfix d-flex justify-content-center mainfather-concision" style="height:100%;">
+     <div class="container clearfix container-concision" id="mainBox">
+      <main>
+       <div class="blog-content-box">
+        <div class="article-header-box" id="article-header-box">
+         <div class="article-header">
+          <div class="article-title-box">
+           <h1 class="title-article" id="articleContentId">
+            PowerJob
+           </h1>
+          </div>
+          <div class="article-info-box">
+           <div class="article-bar-top">
+            <div class="bar-content active">
+             <span class="article-type-text original">
+              原创
+             </span>
+             <a class="article-vip-box" data-report-click='{"spm":"3001.10404"}' data-report-query="spm=3001.10404" data-report-view='{"spm":"3001.10404"}' href="https://mall.csdn.net/vip" target="_blank">
+              <img alt="" class="article-vip-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/identityVipNew.png"/>
+             </a>
+             <span class="time">
+              于 2024-11-12 10:49:02 发布
+             </span>
+             <span class="border-dian">
+              ·
+             </span>
+             <span class="read-count">
+              923 阅读
+             </span>
+             <div class="read-count-box is-like like-ab-new" data-type="top">
+              <span class="border-dian">
+               ·
+              </span>
+              <img alt="" class="article-read-img article-heard-img active" id="is-like-imgactive-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Active.png" style="display:none"/>
+              <img alt="" class="article-read-img article-heard-img" id="is-like-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Black.png" style="display:block"/>
+              <span class="read-count" id="blog-digg-num" style="color:;">
+               14
+              </span>
+             </div>
+             <span class="border-dian">
+              ·
+             </span>
+             <a class="un-collection" data-report-click='{"mod":"popu_823","spm":"1001.2101.3001.4232","ab":"new"}' id="blog_detail_zk_collection">
+              <img alt="" class="article-collect-img article-heard-img un-collect-status isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect2.png" style="display:inline-block"/>
+              <img alt="" class="article-collect-img article-heard-img collect-status isactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive2.png" style="display:none"/>
+              <span class="get-collection">
+               22
+              </span>
+             </a>
+             <span class="border-dian">
+              ·
+             </span>
+             <div class="href-article-edit-new">
+              <span class="href-article-edit-click">
+               CC 4.0 BY-SA版权
+              </span>
+              <div class="slide-content-box-new">
+               版权声明：本文为博主原创文章，遵循
+               <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">
+                CC 4.0 BY-SA
+               </a>
+               版权协议，转载请附上原文出处链接和本声明。
+              </div>
+             </div>
+            </div>
+            <div class="operating active">
+            </div>
+           </div>
+           <div class="blog-tags-box">
+            <div class="tags-box artic-tag-box">
+             <div class="article-tag">
+              <span class="label">
+               文章标签：
+              </span>
+              <p>
+               <a class="tag-link-new" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"tomcat","ab":"new","extra":"{\"searchword\":\"tomcat\"}"}' data-report-query="spm=1001.2101.3001.4223" data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"tomcat","ab":"new","extra":"{\"searchword\":\"tomcat\"}"}' href="https://so.csdn.net/so/search/s.do?q=tomcat&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=&amp;from_tracking_code=tag_word&amp;from_code=app_blog_art" rel="noopener" target="_blank">
+                #tomcat
+               </a>
+              </p>
+             </div>
+             <p class="community-name" id="community-name">
+             </p>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="" id="blogHuaweiyunAdvert">
+        </div>
+        <article class="baidu_pl">
+         <div class="article_content clearfix" id="article_content">
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css" rel="stylesheet"/>
+          <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-10bf609291.css" rel="stylesheet"/>
+          <div class="htmledit_views atom-one-dark" id="content_views">
+           <p>
+            1、概述
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+            <strong>
+             PowerJob
+            </strong>
+            是新一代分布式任务调度与计算框架，支持CRON、API、固定频率、固定延迟等调度策略，提供工作流来编排任务解决依赖关系，能让您轻松完成作业的调度与繁杂任务的分布式计算。
+           </p>
+           <p>
+           </p>
+           <p>
+            2、为什么选择PowerJob？
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+            当前市面上流行的作业调度框架有老牌的Quartz、基于Quartz的elastic-job和原先基于Quartz后面移除依赖的xxl-job，这里分别谈一些这些框架现存的缺点。
+            <a href="https://mp.weixin.qq.com/s/MsbCWoiUertB6-PkBSRr1w" rel="nofollow" title="推荐：Java面试题">
+             推荐：Java面试题
+            </a>
+           </p>
+           <p>
+           </p>
+           <p>
+            Quartz可以视为第一代任务调度框架，基本上是现有所有分布式调度框架的“祖宗”。由于历史原因，它不提供Web界面，只能通过API完成任务的配置，使用起来不够方便和灵活，同时它仅支持单机执行，无法有效利用整个集群的计算能力。
+           </p>
+           <p>
+           </p>
+           <p>
+            xxl-job可以视为第二代任务调度框架，在一定程度上解决了Quartz的不足，在过去几年中是个非常优秀的调度框架，不过放到今天来看，还是存在着一些不足的，具体如下：
+           </p>
+           <p>
+           </p>
+           <ul>
+            <li>
+             <p>
+              数据库支持单一：仅支持MySQL，使用其他DB需要自己魔改代码
+             </p>
+            </li>
+            <li>
+             <p>
+              有限的分布式计算能力：仅支持静态分片，无法很好的完成复杂任务的计算
+             </p>
+            </li>
+            <li>
+             <p>
+              不支持工作流：无法配置各个任务之间的依赖关系，不适用于有DAG需求的场景
+             </p>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <p>
+            正所谓长江后浪推前浪，在如今这个数据量日益增长、业务越来越复杂的年代，急需一款更为强大的任务调度框架来解决上诉问题，而PowerJob因此应运而生。
+           </p>
+           <p>
+           </p>
+           <p>
+            PowerJob可以被认为是第三代任务调度框架，在任务调度的基础上，还额外提供了分布式计算和工作流功能，其主要特性如下：
+           </p>
+           <p>
+           </p>
+           <ul>
+            <li>
+             <p>
+              使用简单：提供前端Web界面，允许开发者可视化地完成调度任务的管理（增、删、改、查）、任务运行状态监控和运行日志查看等功能。
+             </p>
+            </li>
+            <li>
+             <p>
+              定时策略完善：支持CRON表达式、固定频率、固定延迟和API四种定时调度策略。
+             </p>
+            </li>
+            <li>
+             <p>
+              执行模式丰富：支持单机、广播、Map、MapReduce四种执行模式，其中Map/MapReduce处理器能使开发者寥寥数行代码便获得集群分布式计算的能力。
+             </p>
+            </li>
+            <li>
+             <p>
+              DAG工作流支持：支持在线配置任务依赖关系，可视化得对任务进行编排，同时还支持上下游任务间的数据传递
+             </p>
+            </li>
+            <li>
+             <p>
+              执行器支持广泛：支持Spring Bean、内置/外置Java类、Shell、Python等处理器，应用范围广。
+             </p>
+            </li>
+            <li>
+             <p>
+              运维便捷：支持在线日志功能，执行器产生的日志可以在前端控制台页面实时显示，降低debug成本，极大地提高开发效率。
+             </p>
+            </li>
+            <li>
+             <p>
+              依赖精简：最小仅依赖关系型数据库（MySQL/PostgreSQL/Oracle/MS SQLServer…），同时支持所有Spring Data JPA所支持的关系型数据库。
+             </p>
+            </li>
+            <li>
+             <p>
+              高可用&amp;高性能：调度服务器经过精心设计，一改其他调度框架基于数据库锁的策略，实现了无锁化调度。部署多个调度服务器可以同时实现高可用和性能的提升（支持无限的水平扩展）。
+             </p>
+            </li>
+            <li>
+             <p>
+              故障转移与恢复：任务执行失败后，可根据配置的重试策略完成重试，只要执行器集群有足够的计算节点，任务就能顺利完成。
+             </p>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <p>
+            3、同类产品对比
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p class="img-center">
+            <img alt="图片" height="645" src="https://img-blog.csdnimg.cn/img_convert/23f3fed359f684e6d8caf0585e51fc7e.png" width="1080"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            4、适用场景
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+            有定时执行需求的业务场景：如每天凌晨全量同步数据、生成业务报表等。
+           </p>
+           <p>
+           </p>
+           <p>
+            有需要全部机器一同执行的业务场景：如使用广播执行模式清理集群日志。
+           </p>
+           <p>
+           </p>
+           <p>
+            有需要分布式处理的业务场景：比如需要更新一大批数据，单机执行耗时非常长，可以使用Map/MapReduce处理器完成任务的分发，调动整个集群加速计算。
+           </p>
+           <p>
+           </p>
+           <p>
+            5、整体架构
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p class="img-center">
+            <img alt="图片" height="898" src="https://img-blog.csdnimg.cn/img_convert/c2f92b62e32c0073d4408134820c4ffa.png" width="998"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            6、快速开始
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+            PowerJob由调度服务器（powerjob-server）和执行器(powerjob-worker)两部分组成，powerjob-server负责提供Web服务和完成任务的调度，powerjob-worker则负责执行用户所编写的任务代码，同时提供分布式计算能力。
+            <a href="https://mp.weixin.qq.com/s/MsbCWoiUertB6-PkBSRr1w" rel="nofollow" title="推荐：Java面试题">
+             推荐：Java面试题
+            </a>
+           </p>
+           <p>
+           </p>
+           <p>
+            7、初始化项目
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <pre><code>git clone https://github.com/KFCFans/PowerJob.git</code></pre>
+           <p>
+           </p>
+           <p>
+            导入 IDE，源码结构如下，我们需要启动调度服务器（powerjob-server），同时在samples工程中编写自己的处理器代码
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p class="img-center">
+            <img alt="图片" height="550" src="https://img-blog.csdnimg.cn/img_convert/b8598b22bd0cd7aa4a402bf2e0e32814.png" width="1080"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            8、启动调度服务器
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+            创建数据库
+            <strong>
+             powerjob-daily
+            </strong>
+           </p>
+           <p>
+           </p>
+           <p>
+            修改配置文件，配置文件的说明官方文档写的非常详细，此处不再赘述。需要修改的地方为数据库配置spring.datasource.core.jdbc-url、spring.datasource.core.username和spring.datasource.core.password，当然，有mongoDB的同学也可以修改spring.data.mongodb.uri以获取完全版体验。
+           </p>
+           <p>
+           </p>
+           <pre><code>oms.env=DAILY
+logging.config=classpath:logback-dev.xml
+
+####### 数据库配置 #######
+spring.datasource.core.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.core.jdbc-url=jdbc:mysql://remotehost:3306/powerjob-daily?useUnicode=true&amp;characterEncoding=UTF-8
+spring.datasource.core.username=root
+spring.datasource.core.password=No1Bug2Please3!
+spring.datasource.core.hikari.maximum-pool-size=20
+spring.datasource.core.hikari.minimum-idle=5
+
+####### mongoDB配置，非核心依赖，可移除 #######
+spring.data.mongodb.uri=mongodb://remotehost:27017/powerjob-daily
+
+####### 邮件配置（启用邮件报警则需要） #######
+spring.mail.host=smtp.163.com
+spring.mail.username=zqq
+spring.mail.password=qqz
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
+
+####### 资源清理配置 #######
+oms.log.retention.local=1
+oms.log.retention.remote=1
+oms.container.retention.local=1
+oms.container.retention.remote=-1
+oms.instanceinfo.retention=1
+
+####### 缓存配置 #######
+oms.instance.metadata.cache.size=1024</code></pre>
+           <p>
+           </p>
+           <p>
+            完成配置文件的修改后，可以直接通过启动类com.github.kfcfans.powerjob.server.OhMyApplication启动调度服务器，观察启动日志，查看是否启动成功～启动成功后，访问 http://127.0.0.1:7700/ ，如果能顺利出现Web界面，则说明调度服务器启动成功！
+           </p>
+           <p>
+           </p>
+           <p>
+            注册应用：点击主页应用注册按钮，填入 oms-test和控制台密码（用于进入控制台），注册示例应用（当然你也可以注册其他的appName，只是别忘记在示例程序中同步修改～）
+           </p>
+           <p>
+           </p>
+           <p>
+            <img alt="" height="508" src="https://i-blog.csdnimg.cn/direct/7a673472fc1e486d9b35f5909df6dfc4.png" width="1080"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            9、编写示例代码
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+            进入示例工程（powerjob-worker-samples），修改配置文件连接powerjob-server并编写自己的处理器代码。
+           </p>
+           <p>
+           </p>
+           <p>
+            修改powerjob-worker-samples的启动配置类com.github.kfcfans.powerjob.samples.OhMySchedulerConfig，将AppName修改为刚刚在控制台注册的名称。
+           </p>
+           <p>
+           </p>
+           <pre><code>@Configuration
+public class OhMySchedulerConfig {
+    @Bean
+    public OhMyWorker initOMS() throws Exception {
+
+        // 服务器HTTP地址（端口号为 server.port，而不是 ActorSystem port）
+        List&lt;String&gt; serverAddress = Lists.newArrayList("127.0.0.1:7700");
+
+        // 1. 创建配置文件
+        OhMyConfig config = new OhMyConfig();
+        config.setPort(27777);
+        config.setAppName("oms-test");
+        config.setServerAddress(serverAddress);
+        // 如果没有大型 Map/MapReduce 的需求，建议使用内存来加速计算
+        config.setStoreStrategy(StoreStrategy.MEMORY);
+
+        // 2. 创建 Worker 对象，设置配置文件
+        OhMyWorker ohMyWorker = new OhMyWorker();
+        ohMyWorker.setConfig(config);
+        return ohMyWorker;
+    }
+}</code></pre>
+           <p>
+           </p>
+           <p>
+            编写自己的处理器：随便找个地方新建类，继承你想要使用的处理器（各个处理器的介绍可见官方文档，文档非常详细），这里为了简单演示，选择使用单机处理器BasicProcessor，以下是代码示例。
+           </p>
+           <p>
+           </p>
+           <pre><code>@Slf4j
+@Component
+public class StandaloneProcessorDemo implements BasicProcessor {
+
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+
+        OmsLogger omsLogger = context.getOmsLogger();
+        omsLogger.info("StandaloneProcessorDemo start process,context is {}.", context);
+        System.out.println("jobParams is " + context.getJobParams());
+        
+        return new ProcessResult(true, "process successfully~");
+    }
+}</code></pre>
+           <p>
+           </p>
+           <p>
+            启动示例程序，即直接运行主类com.github.kfcfans.powerjob.samples.SampleApplication，观察控制台输出信息，判断是否启动成功。
+            <a href="https://mp.weixin.qq.com/s/MsbCWoiUertB6-PkBSRr1w" rel="nofollow" title="推荐：Java面试题">
+             推荐：Java面试题
+            </a>
+           </p>
+           <p>
+           </p>
+           <p>
+            10、任务的配置与运行
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p>
+            调度服务器与示例工程都启动完毕后，再次前往Web页面（ http://127.0.0.1:7700/ ），进行任务的配置与运行。
+           </p>
+           <p>
+           </p>
+           <p>
+            在首页输入框输入配置的应用名称，成功操作后会正式进入前端管理界面。
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p class="img-center">
+            <img alt="图片" height="357" src="https://img-blog.csdnimg.cn/img_convert/3fd63741b5aa931ac476484e1a097fb8.png" width="1080"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            点击任务管理 -&gt; 新建任务（右上角），开始创建任务。
+           </p>
+           <p>
+           </p>
+           <p>
+            <img alt="" height="748" src="https://i-blog.csdnimg.cn/direct/a88708013d164b349c3b6775ddec84b9.png" width="937"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            完成任务创建后，即可在控制台看到刚才创建的任务，如果觉得等待调度太过于漫长，可以直接点击运行按钮，立即运行本任务。
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <p class="img-center">
+            <img alt="图片" height="490" src="https://img-blog.csdnimg.cn/img_convert/fa98779d1c71e7f79a81b8c3444409b4.png" width="1080"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            前往任务示例边栏，查看任务的运行状态和在线日志
+           </p>
+           <p>
+           </p>
+           <p>
+            <img alt="" height="526" src="https://i-blog.csdnimg.cn/direct/ff8f24179ed144c59a1b969edf9237c8.png" width="1080"/>
+           </p>
+           <p>
+           </p>
+           <p>
+            基础的教程到这里也就结束了～更多功能示例可见官方文档，工作流、MapReduce、容器等高级特性等你来探索！
+           </p>
+           <p>
+           </p>
+           <p>
+            11、相关链接
+           </p>
+           <p>
+           </p>
+           <p>
+           </p>
+           <ul>
+            <li>
+             <p>
+              <strong>
+               项目地址：https://github.com/KFCFans/PowerJob
+              </strong>
+             </p>
+            </li>
+            <li>
+             <p>
+              <strong>
+               官方文档：https://www.yuque.com/powerjob/guidence/ztn4i5
+              </strong>
+             </p>
+            </li>
+            <li>
+             <p>
+              <strong>
+               在线试用：https://www.yuque.com/powerjob/guidence/hnbskn
+              </strong>
+             </p>
+            </li>
+           </ul>
+           <p>
+           </p>
+           <p>
+            来源：blog.csdn.net/LY_624/article/details/106987036
+           </p>
+          </div>
+         </div>
+        </article>
+       </div>
+       <div class="directory-boxshadow-dialog" style="display:none;">
+        <div class="directory-boxshadow-dialog-box">
+        </div>
+        <div class="vip-limited-time-offer-box-new" id="vip-limited-time-offer-box-new">
+         <img class="limited-img limited-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-newWhite.png"/>
+         <div class="vip-limited-time-top">
+          确定要放弃本次机会？
+         </div>
+         <span class="vip-limited-time-text">
+          福利倒计时
+         </span>
+         <div class="limited-time-box-new">
+          <span class="time-hour">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-minite">
+          </span>
+          <i>
+           :
+          </i>
+          <span class="time-second">
+          </span>
+         </div>
+         <div class="limited-time-vip-box">
+          <p>
+           <img class="coupon-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-roup.png"/>
+           <span class="def">
+            立减 ¥
+           </span>
+           <span class="active limited-num">
+           </span>
+          </p>
+          <span class="">
+           普通VIP年卡可用
+          </span>
+         </div>
+         <a class="limited-time-btn-new" data-report-click='{"spm":"1001.2101.3001.9621"}' data-report-query="spm=1001.2101.3001.9621" href="https://mall.csdn.net/vip">
+          立即使用
+         </a>
+        </div>
+       </div>
+       <a id="commentBox" name="commentBox">
+       </a>
+      </main>
+     </div>
+     <div class="recommend-right1 align-items-stretch clearfix" data-type="recommend" id="rightAsideConcision">
+      <aside class="recommend-right_aside">
+       <div id="recommend-right-concision">
+        <div class="flex-column aside-box groupfile" id="groupfileConcision">
+         <div class="groupfile-div1">
+          <h3 class="aside-title">
+           目录
+          </h3>
+          <div class="align-items-stretch group_item">
+           <div class="pos-box">
+            <div class="scroll-box">
+             <div class="toc-box">
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </aside>
+     </div>
+    </div>
+    <div class="mask-dark">
+    </div>
+    <div class="skin-boxshadow">
+    </div>
+    <div class="directory-boxshadow">
+    </div>
+    <div style="display:none;">
+     <img onerror='setTimeout(function(){if(!/(csdn.net|iteye.com|baiducontent.com|googleusercontent.com|360webcache.com|sogoucdn.com|bingj.com|baidu.com)$/.test(window.location.hostname)){window="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74"}},3000);' src=""/>
+    </div>
+    <div class="keyword-dec-box" id="keywordDecBox">
+    </div>
+   </link>
+  </link>
+ </body>
+ <!-- 富文本柱状图  -->
+ <link href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css" rel="stylesheet">
+  <link href="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.css" rel="stylesheet"/>
+  <link href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-dark.css" rel="stylesheet"/>
+ </link>
+</html>
