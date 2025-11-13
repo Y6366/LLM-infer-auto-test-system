@@ -1358,3 +1358,466 @@ X-Operator: u001
 ---
 
 如果你要把 `fixedPrefix` 改得更贴合你环境（比如 vLLM MS/Ascend 的具体 entrypoint），只需修改 `FIXED_PREFIX` 常量即可；其余流程不变。需要我再补一条“更新接口”的同风格实现（只改 master/workerArgs/envVars 并重渲染 `run_command`）也没问题。
+
+新请求体：
+
+```
+{
+  "sceneType": "vllm",
+  "modelBackend": "vllm",
+  "vllmMsVersion": "n/a",
+  "modelName": "llama3-8b",
+
+  "envs": [
+    {"name":"CUDA_VISIBLE_DEVICES","value":"0,1"}
+  ],
+
+  "masterArgs": [
+    {"name":"model","value":"/mnt/ckpt/llama3-8b"},
+    {"name":"tp","value":"2"},
+    {"name":"enable-chunked-prefill","flag":true}
+  ],
+
+  "workerArgs0": [
+    {"name":"model","value":"/mnt/ckpt/llama3-8b"},
+    {"name":"tp","value":"2"},
+    {"name":"worker-id","value":"0"}
+  ],
+  "workerArgs1": [
+    {"name":"model","value":"/mnt/ckpt/llama3-8b"},
+    {"name":"tp","value":"2"},
+    {"name":"worker-id","value":"1"}
+  ]
+}
+```
+
+太好了，这个请求体格式非常清晰 👍。下面给你一套**可直接落地**的代码骨架，覆盖：DTO 解析（动态 `workerArgs*`）、命令渲染（后端写死固定前缀 + 环境变量 `export` 串 + master/worker 各自 args）、Service 事务落库（`run_command` 列放 JSON，不改表）、Mapper SQL、以及一个最小 Controller。你把这些类丢进你现有的 Spring Boot + MyBatis 项目即可运行。
+
+# 1) DTO：支持动态 `workerArgs*`
+
+```
+// package org.example.api.dto;
+
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+
+import java.util.*;
+
+@Data
+public class ModelCreateReq {
+    private String sceneType;       // vllm / vllm_mindspore / vllm_ascend
+    private String modelBackend;    // 同上
+    private String vllmMsVersion;   // "n/a" 等
+    private String modelName;       // llama3-8b
+
+    private List<EnvKV> envs;       // [{"name":"CUDA_VISIBLE_DEVICES","value":"0,1"}]
+
+    private RunCommand runcommand;  // 见下
+
+    @Data
+    public static class EnvKV {
+        private String name;
+        private String value;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ArgKV {
+        private String name;     // 如 "tp" / "model" / "enable-chunked-prefill"
+        private String value;    // 可选
+        private Boolean flag;    // 可选，true 则仅输出 --name
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class RunCommand {
+        private List<ArgKV> masterArgs = new ArrayList<>();
+
+        // 动态 workerArgs* 会被收集到这里
+        @JsonIgnore
+        private final Map<String, List<ArgKV>> workers = new TreeMap<>();
+
+        @JsonAnySetter
+        public void collectDynamic(String key, Object value) {
+            if (key != null && key.startsWith("workerArgs")) {
+                // value 反序列化成 List<ArgKV>（依赖全局 ObjectMapper，Spring MVC 会自动完成）
+                @SuppressWarnings("unchecked")
+                List<?> raw = (List<?>) value;
+                List<ArgKV> list = new ArrayList<>();
+                for (Object o : raw) {
+                    // Spring 已把 o 映射成 LinkedHashMap
+                    Map<?,?> m = (Map<?,?>) o;
+                    ArgKV a = new ArgKV();
+                    a.setName((String) m.get("name"));
+                    a.setValue((String) m.get("value"));
+                    Object flag = m.get("flag");
+                    a.setFlag(flag instanceof Boolean ? (Boolean) flag : null);
+                    list.add(a);
+                }
+                workers.put(key, list);
+            }
+        }
+
+        public Map<String, List<ArgKV>> getWorkers() { return workers; }
+    }
+}
+
+```
+
+2. 渲染器：写死固定前缀 + 拼 env/export + 拼 master/worker 命令
+
+```
+// package org.example.domain.render;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public final class CommandRenderer {
+
+    // 统一的固定前缀（主从一致；如需按 backend 切换，可做个 Map）
+    private static final String FIXED_PREFIX = "python -m vllm.entrypoint.api_server";
+
+    private CommandRenderer() {}
+
+    @Data
+    @Builder
+    public static class RenderResult {
+        private String envRendered;                 // "export A=1; export B=2;"
+        private String masterRendered;              // 最终 master 命令
+        private Map<String, String> workerRendered; // key: workerArgs0/1..., value: 完整命令
+        private Map<String, Object> raw;            // 原始结构（runcommand + envs），用于一起塞进 JSON
+    }
+
+    public static RenderResult render(String modelBackend,
+                                      List<org.example.api.dto.ModelCreateReq.EnvKV> envs,
+                                      org.example.api.dto.ModelCreateReq.RunCommand rc) {
+
+        String prefix = FIXED_PREFIX; // 可按 backend 选择不同前缀
+        String envStr = renderEnvs(envs);
+
+        String masterCmd = join(prefix, renderArgs(rc.getMasterArgs()));
+
+        Map<String, String> workerCmds = new TreeMap<>();
+        rc.getWorkers().forEach((k, v) -> workerCmds.put(k, join(prefix, renderArgs(v))));
+
+        Map<String, Object> raw = new LinkedHashMap<>();
+        raw.put("envs", envs);
+        raw.put("runcommand", Map.of(
+                "masterArgs", rc.getMasterArgs(),
+                "workers", rc.getWorkers()
+        ));
+
+        return RenderResult.builder()
+                .envRendered(envStr)
+                .masterRendered(masterCmd)
+                .workerRendered(workerCmds)
+                .raw(raw)
+                .build();
+    }
+
+    private static String renderEnvs(List<org.example.api.dto.ModelCreateReq.EnvKV> envs) {
+        if (envs == null || envs.isEmpty()) return "";
+        return envs.stream()
+                .filter(e -> e.getName() != null && !e.getName().isBlank())
+                .map(e -> "export " + e.getName() + "=" + quoteIfNeeded(e.getValue()) + ";")
+                .collect(Collectors.joining(" "));
+    }
+
+    private static String renderArgs(List<org.example.api.dto.ModelCreateReq.ArgKV> args) {
+        if (args == null || args.isEmpty()) return "";
+        List<String> parts = new ArrayList<>();
+        for (var a : args) {
+            if (a.getName() == null || a.getName().isBlank()) continue;
+            String opt = "--" + a.getName();
+            if (Boolean.TRUE.equals(a.getFlag())) {
+                parts.add(opt);
+            } else if (a.getValue() != null && !a.getValue().isBlank()) {
+                parts.add(opt);
+                parts.add(quoteIfNeeded(a.getValue()));
+            } else {
+                // 无 flag 且无值，忽略
+            }
+        }
+        return String.join(" ", parts);
+    }
+
+    private static String quoteIfNeeded(String v) {
+        if (v == null) return "";
+        // 含空格或特殊字符做简单引号保护（根据你环境选择更严谨的转义）
+        if (v.matches(".*[\\s\"'()$&|;<>].*")) {
+            // 用单引号包裹，并把内部单引号替换为'\''简易转义
+            return "'" + v.replace("'", "'\\''") + "'";
+        }
+        return v;
+    }
+
+    private static String join(String prefix, String tail) {
+        if (tail == null || tail.isBlank()) return prefix;
+        return prefix + " " + tail;
+    }
+}
+
+```
+
+3. Entity（沿用你原表，不改表）：`run_command` 放 JSON，`env_variable` 放 export 串
+
+```
+// package org.example.domain;
+
+import lombok.Data;
+import java.time.LocalDateTime;
+
+@Data
+public class ModelInfoDetails {
+    private String modelInfoId;
+    private String vllmMsVersion;
+    private String sceneType;
+    private String sceneDescription;
+    private String ckptPath;
+    private String envType;
+    private String modelName;
+    private Long   nodeNum;
+    private String vllmBuild;
+    private String modelBackend;
+    private String executionModel;
+    private String parallel;
+    private String envVariable;    // 这里放 export 串（后端渲染）
+    private String runCommand;     // 这里放 JSON（包含 raw + rendered）
+    private String remarks;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+    private String createOwner;
+    private String updateOwner;
+    private String ownerGroup;
+    private String dataStatus;     // 枚举字符串：ACTIVE/DELETED 等
+}
+
+```
+
+4. 工具：JSON（Jackson JSR-310 已在你项目里配置）
+
+```
+// package org.example.util;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class Jsons {
+    private final ObjectMapper om;
+
+    public String toJson(Object o){
+        try { return om.writeValueAsString(o); }
+        catch (JsonProcessingException e){ throw new RuntimeException(e); }
+    }
+}
+
+```
+
+5. Mapper：插入（MyBatis 注解版示例）
+
+```
+// package org.example.mapper;
+
+import org.apache.ibatis.annotations.*;
+import org.example.domain.ModelInfoDetails;
+
+@Mapper
+public interface ModelInfoMapper {
+
+    @Insert({
+      "INSERT INTO model_info_details(",
+      "  model_info_id, vllm_ms_version, scene_type, model_name,",
+      "  model_backend, env_variable, run_command, remarks,",
+      "  create_owner, update_owner, owner_group, data_status,",
+      "  create_time, update_time",
+      ") VALUES (",
+      "  #{modelInfoId}, #{vllmMsVersion}, #{sceneType}, #{modelName},",
+      "  #{modelBackend}, #{envVariable}, #{runCommand}, #{remarks},",
+      "  #{createOwner}, #{updateOwner}, #{ownerGroup}, #{dataStatus},",
+      "  NOW(), NOW()",
+      ")"
+    })
+    int insert(ModelInfoDetails po);
+
+    @Select("SELECT * FROM model_info_details WHERE model_info_id = #{id}")
+    ModelInfoDetails findById(@Param("id") String id);
+}
+
+```
+
+说明：这里只演示了最少字段（与你请求紧密相关）。你可以把其余字段一并补上；不影响核心逻辑。
+
+6. Service：渲染 + 组装 PO + 入库 + 记日志（省略日志表的话可去掉）
+
+```
+// package org.example.service;
+
+import lombok.RequiredArgsConstructor;
+import org.example.api.dto.ModelCreateReq;
+import org.example.domain.ModelInfoDetails;
+import org.example.domain.render.CommandRenderer;
+import org.example.mapper.ModelInfoMapper;
+import org.example.util.Jsons;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+public class ModelInfoService {
+    private final ModelInfoMapper mapper;
+    private final Jsons jsons;
+
+    @Transactional
+    public String create(ModelCreateReq req, String operator){
+        // 1) 渲染 env + master/worker 命令
+        var render = CommandRenderer.render(
+                req.getModelBackend(),
+                req.getEnvs(),
+                req.getRuncommand()
+        );
+
+        // 2) 拼 run_command 的 JSON（不改表，全部塞进一个 JSON）
+        Map<String, Object> runCmdJson = new LinkedHashMap<>();
+        runCmdJson.put("rendered", Map.of(
+            "env", render.getEnvRendered(),
+            "master", render.getMasterRendered(),
+            "workers", render.getWorkerRendered()
+        ));
+        runCmdJson.put("raw", render.getRaw()); // 原始结构留存，便于后续 UI 回显/复现
+
+        // 3) 组装 PO
+        var id = UUID.randomUUID().toString();
+        ModelInfoDetails po = new ModelInfoDetails();
+        po.setModelInfoId(id);
+        po.setVllmMsVersion(req.getVllmMsVersion());
+        po.setSceneType(req.getSceneType());
+        po.setModelName(req.getModelName());
+        po.setModelBackend(req.getModelBackend());
+        po.setEnvVariable(render.getEnvRendered());   // export 串
+        po.setRunCommand(jsons.toJson(runCmdJson));   // JSON（rendered + raw）
+        po.setRemarks("create by API");
+        po.setCreateOwner(operator);
+        po.setUpdateOwner(operator);
+        po.setOwnerGroup("PUBLIC");
+        po.setDataStatus("ACTIVE");
+
+        // 4) 落库
+        mapper.insert(po);
+
+        // 如需写 model_info_log，可在此补 INSERT 审计
+        return id;
+    }
+}
+
+```
+
+7. Controller：最小可测
+
+```
+// package org.example.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.example.api.dto.ModelCreateReq;
+import org.example.service.ModelInfoService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/models")
+@RequiredArgsConstructor
+public class ModelInfoController {
+
+    private final ModelInfoService service;
+
+    @PostMapping
+    public String create(@RequestBody ModelCreateReq req,
+                         @RequestHeader(value="X-Operator", required=false) String operator){
+        return service.create(req, operator == null ? "u001" : operator);
+    }
+}
+
+```
+
+# 8) 一次自测
+
+**请求体（就是你给的那份）：**
+
+```
+{
+  "sceneType": "vllm",
+  "modelBackend": "vllm",
+  "vllmMsVersion": "n/a",
+  "modelName": "llama3-8b",
+  "envs": [
+    {"name":"CUDA_VISIBLE_DEVICES","value":"0,1"}
+  ],
+  "runcommand": {
+    "masterArgs": [
+      {"name":"model","value":"/mnt/ckpt/llama3-8b"},
+      {"name":"tp","value":"2"},
+      {"name":"enable-chunked-prefill","flag":true}
+    ],
+    "workerArgs0": [
+      {"name":"model","value":"/mnt/ckpt/llama3-8b"},
+      {"name":"tp","value":"2"},
+      {"name":"worker-id","value":"0"}
+    ],
+    "workerArgs1": [
+      {"name":"model","value":"/mnt/ckpt/llama3-8b"},
+      {"name":"tp","value":"2"},
+      {"name":"worker-id","value":"1"}
+    ]
+  }
+}
+
+```
+
+**预期入库：**
+
+- `env_variable`：`export CUDA_VISIBLE_DEVICES=0,1;`
+  
+- `run_command`（JSON，示例结构）：
+  
+
+```
+{
+  "rendered": {
+    "env": "export CUDA_VISIBLE_DEVICES=0,1;",
+    "master": "python -m vllm.entrypoint.api_server --model '/mnt/ckpt/llama3-8b' --tp 2 --enable-chunked-prefill",
+    "workers": {
+      "workerArgs0": "python -m vllm.entrypoint.api_server --model '/mnt/ckpt/llama3-8b' --tp 2 --worker-id 0",
+      "workerArgs1": "python -m vllm.entrypoint.api_server --model '/mnt/ckpt/llama3-8b' --tp 2 --worker-id 1"
+    }
+  },
+  "raw": { ... 与请求体 runcommand+envs 等价 ... }
+}
+
+```
+
+# 9) 要点与可选增强
+
+- **workerArgs 动态**：通过 `@JsonAnySetter` 自动收集所有 `workerArgs*`，不存在时 `workers` 为空，逻辑自动只渲染 master。
+  
+- **固定前缀**：现在写死在 `CommandRenderer.FIXED_PREFIX`，你可以按 `modelBackend`/`sceneType` 搭映射，或支持 profile 配置。
+  
+- **转义**：简单做了含空格/特殊字符的单引号包裹；如涉及复杂 shell，需要更严格的转义或直接改为数组式执行（不拼字符串）。
+  
+- **列长**：你原表 `run_command` 是 `varchar(500)` 的话，可能不够放 JSON，建议实际环境把列调成 `TEXT`（你当前要求“不改表”，那就先控制 JSON 体积，或者仅放 `rendered`）。
+  
+- **幂等**：如果要避免重复创建，可加业务唯一键（如 `(scene_type, model_name, vllm_ms_version)`）+ 捕获唯一冲突处理。
+  
+- **审计**：如需写 `model_info_log`，直接把 `runCmdJson` 放 `new_data`，`changed_fields` 关注 `run_command`/`env_variable` 即可。
+  
+
+---
+
+需要我把上面的 Mapper/Service 按你现有的分层与命名规范合并到项目里（连同审计表插入/分页查询）也可以继续发我你当前代码片段，我帮你对齐。
