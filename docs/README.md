@@ -1,0 +1,108 @@
+# LLM-infer-auto-test-system
+用于针对大模型产品进行自动化测试平台<br>
+<br>
+## WHAT？<br>
+当前平台预期解决哪些问题？<br>
+&emsp;1、针对各类大模型产品可进行性能，精度相关指标测试，及相关数据展示。<br>
+&emsp;2、针对同一模型部署在不同服务器类型进行硬件层面竞品测试，及相关数据展示。<br>
+&emsp;3、压测自动化，提供针对大模型服务的压测自动化平台，并展示相关测试数据。<br>
+<br>
+## HOW？<br>
+&emsp;系统整体设计逻辑：<br>
+&emsp;&emsp;基础设施建设阶段提供部分可复用性较强功能模块，中期提供完成业务流程功能，后期同其他系统进行功能交互融合。<br>
+<br>
+## 核心理念：“一套标准的用例/指标规范 + 可插拔执行器 + 可追溯的结果仓 + 低代码编排”。<br>
+<br>
+## 基础设施模块：<br>
+&emsp;1、环境配置模块<br>
+&emsp;2、日志文件管理模块<br>
+&emsp;3、工具管理模块<br>
+&emsp;4、模型管理模块<br>
+&emsp;5、数据展示模块<br>
+&emsp;6、画布工作流模块<br>
+
+
+## 1、环境配置模块：<br>
+&emsp;预期：封装自动化linux环境配置，针对大模型执行所需的相关配套组件，提供指定版本的自动化环境部署。相关配套组件如：vllm, vllm_mindspore, mindspore_gs, msadapter, python, aisbench等。<br>
+<br>
+&emsp;（1）环境定义标准化：支持三类规格文件：<br>
+&emsp;&emsp;env.yaml：基础镜像、驱动、CUDA/ROCm、Python 版本、关键依赖版本（vLLM、msadapter、MindSpore、aisbench…）<br>
+&emsp;&emsp;hardware.yaml：GPU/CPU/内存/网络/电源限制（功耗上限）、NUMA 绑核策略<br>
+&emsp;&emsp;runtime.yaml：容器启动参数、挂载、端口、超时、日志重定向规则<br>
+&emsp;（2）镜像优先策略：优先指定镜像（不可变环境），其次才是按需 pip/apt 安装（可变环境，降低优先级）。<br>
+&emsp;（3）镜像仓库集成：支持多 registry（私有/公有），拉取凭据保存在 Secrets 管理器（Vault/K8s Secret）。<br>
+&emsp;（4）幂等+回滚：每次环境变更产生日志和快照（镜像 tag + env 指纹哈希），支持一键回滚。<br>
+&emsp;（5）执行效果：点击指定服务器图标后，顶端可提供已有镜像清单，此处数据可从指定镜像仓库获取。如已指定镜像切不再需要单独配置，则下方各配置项自动填充为该镜像内依赖版本信息，如需修改则可按需修改，如无待修改项，则直接使用即可。此模块需在画布工作流模块执行可视化调用。<br>
+<br>
+<img width="2300" height="1386" alt="89139dd8e13a2b59c1866800d1e277e9" src="https://github.com/user-attachments/assets/14b9514f-9641-47f6-93cf-7650355fc7ac" />
+<img width="2304" height="1380" alt="3f2d04e340f6bf1e1860543a60339bcb" src="https://github.com/user-attachments/assets/11801e32-b6b5-4f59-bfa0-5a1d100e945d" />
+
+
+## 2、日志文件管理模块<br>
+&emsp;预期：提供日志解析功能，可在该模块内提供，<br>
+&emsp;&emsp;测试工具日志文件样例，可标注关键数据含义，关键信息含义，用于数据展示模块调用展示。<br>
+&emsp;&emsp;模型日志文件样例，可标注关键数据含义，关键信息含义，必要信息可用于数据展示模块调用展示。<br>
+<br>
+&emsp;（1）解析器“插件”机制：每种工具/模型产出的日志，配一个 Parser 插件（正则/JSONPath/自定义脚本），统一输出标准 KV（见“指标规范”）。<br>
+&emsp;（2）字段词典（Data Dictionary）：为每个指标/字段给出定义、单位、采集方法、口径（P50/P95/P99 等）与示例。<br>
+&emsp;（3）多格式支持：纯文本、JSON、CSV、二进制 profile（nsys/ti）→ 统一抽取到结构化表。<br>
+&emsp;（4）异常识别：常见错误模式库（OOM、连接拒绝、超时、CUDA 错误…）自动标注失败原因。<br>
+<br>
+## 3、工具管理模块<br>
+&emsp;预期：提供测试工具管理可视化操作页面，可引入，管理各类测试工具，可指定工具位置，工具入参，工具执行后相关日志所在位置，可调用日志文件管理模块针对包含执行数据等日志文件进行关键数据获取过滤。<br>
+<br>
+&emsp;（1）工具描述清单 tool.yaml：<br>
+&emsp;&emsp;元信息：名称、版本、来源（git tag/commit、镜像）、许可证<br>
+&emsp;&emsp;入参Schema（JSON Schema）：确保画布/表单参数合法性<br>
+&emsp;&emsp;输出Schema：日志路径、结果文件路径、预期采集的指标字段<br>
+&emsp;（2）依赖：环境前置条件（需要哪些包/驱动/端口）<br>
+&emsp;（3）校验&干跑（dry-run）：在提交前，用容器快速拉起验证参数正确、命令能启动。<br>
+&emsp;（4）可视化映射：将“工具输出”自动映射到“日志解析器”，减少人工配置。<br>
+<br>
+<img width="3024" height="1362" alt="image" src="https://github.com/user-attachments/assets/73f53113-83c0-47c8-8198-868434d7d1b1" />
+
+## 4、模型管理模块<br>
+&emsp;预期：提供针对各类模型的调用执行设置，可在该模块内添加模型执行命令，各类候选参数，是否需重定向日志，如需重定向，可指定日志相对路径。<br>
+<br>
+&emsp;（1）模型清单 model.yaml：<br>
+&emsp;&emsp;模型ID、权重来源（S3/HuggingFace/私有仓）、版本哈希、Tokenizer 版本<br>
+&emsp;&emsp;推理后端（vLLM/vllm_mindspore/自研后端），启动命令模板（支持占位符）<br>
+&emsp;&emsp;运行形态（单卡/多卡、张量并行、pipeline 并行、MoE 配置）<br>
+&emsp;&emsp;日志与指标导出（OpenTelemetry/Prometheus exporter 开关）<br>
+&emsp;（2）一致的推理服务契约（OpenAPI/gRPC IDL）：统一“/generate”、“/embed”、“/rerank”等接口，压测与精度校验工具可无缝替换后端。<br>
+&emsp;（3）模型卡片（Model Card：自动展示维度：训练域、已知限制、适配任务、合规标签（安全、隐私）。<br>
+<br>
+<img width="2300" height="1382" alt="d1ffcd18af20722467f7ec9c675640c1" src="https://github.com/user-attachments/assets/359fba67-bddd-45d6-9559-758fbfc4b4ac" />
+<img width="2302" height="1382" alt="edfe9f2de11a6565c701405f52ea460b" src="https://github.com/user-attachments/assets/62e8eee3-76f1-4437-a64b-e880d3d26b08" />
+
+## 5、数据展示模块<br>
+&emsp;预期：当前系统首页展示即为数据展示模块，该模块内提供常规数据汇总展示，竞品数据对比展示，压测数据展示。<br>
+<br>
+&emsp;（1）首页仪表盘（可配置卡片）：<br>
+&emsp;&emsp;当天/本周关键指标（TTFT/TBT/TTE、吞吐、Token成本、GPU利用率、能耗）<br>
+&emsp;&emsp;失败率&失败 Top 原因、告警<br>
+&emsp;&emsp;最近竞品对比/压测趋势<br>
+&emsp;（2）三类常规展示<br>
+&emsp;&emsp;&emsp;常规数据展示一：按场景/用例汇总（版本切换）：支持钻取到单次 Run，查看日志与调用链。用于在选择指定版本场景后罗列展示所有看护数据，基于某一依赖版本信息作为筛选条件，以场景或用例维度进行数据汇总展示。<br>
+&emsp;&emsp;&emsp;常规数据展示二：跨版本趋势：同一指标随依赖演进的趋势；支持自动回归检测（阈值或统计检验）。以用例或场景为筛选条件，在不同版本配套维度进行某一指标的跨版本数据展示，可展示该指标在不同版本演进过程中的数据分布和变化趋势。<br>
+&emsp;&emsp;&emsp;常规数据展示三：工具数据汇总：统一“工具-版本-环境-指标”四维透视，支持筛选/导出。针对各类测试工具执行后输出的各类测试数据，进行汇总展示。<br>
+<br>
+&emsp;（3）竞品数据展示：针对某一模型，同一测试工具，在不同显卡环境的相关性能数据进行对比展示。亦可生成相关竞品测试报告。<br>
+&emsp;&emsp;同一模型，在不同 GPU/CPU/加速卡下的性能雷达图/柱状图，自动生成一页式报告（PDF/HTML）。<br>
+&emsp;&emsp;成本维度：引入“成本/1k tokens”、“能耗/1k tokens”、“性能/功耗”等指标，避免只看吞吐。<br>
+<br>
+&emsp;（4）压测数据展示：<br>
+&emsp;&emsp;选择对应的压测记录，提供选择指定性能指标选项，以直方图，折线图，散点图等形式展示该指标在压测过程中数据部分及变化情况。<br>
+&emsp;&emsp;支持开放/闭环到达过程（Poisson、固定并发）、实时流式指标（TP95/TP99随时间线）、错误随并发变化。<br>
+&emsp;&emsp;稳定性视图：长压（3~24h）中的漂移、退化、泄漏（显存碎片、句柄增长）。<br>
+<br>
+## 6、画布工作流模块<br>
+&emsp;预期：形成可引入完整流程的的低代码平台，可拖拽环境配置模块，模型管理模块，工具管理模块内表示图标至画布内，通过箭头标识线连接，指定工作流执行顺序。<br>
+<br>
+&emsp;节点类型：环境准备节点、模型服务节点、工具执行节点、对比计算节点、报告生成节点、清理回收节点。<br>
+&emsp;边的语义：数据依赖（产出/消费）、控制依赖（成功/失败/重试）、并行/汇聚。<br>
+&emsp;表单自动生成：基于工具/模型的 JSON Schema 自动生成可视化表单。<br>
+&emsp;策略：超时、重试、断点续跑、幂等、批量矩阵（不同参数/不同硬件组合的自动展开）。<br>
+&emsp;Dry-run & Lint：提交前进行语义校验（必填参数、依赖闭环、资源配额）。<br>
+<img width="2302" height="1380" alt="7251c5b8d8b5793c06611d8e33072b6d" src="https://github.com/user-attachments/assets/6fa6c1dc-5a26-4c94-9add-c04b4dad34a0" />
+
